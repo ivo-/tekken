@@ -14,13 +14,31 @@
     om/IInitState
     (init-state
       [_]
-      {:text ""
+      {:text "
+Напишете някви лайна?
+
+```
+(def a 10)
+```
+
+- a
+- b
++ c
+- d
+
+---
+"
        :onChange
        (fn [_]
          (let [value (->> (om/get-node owner "text")
                           (.-value))]
            (om/set-state! owner :text value)
            (put! ch value)))})
+
+    om/IDidMount
+    (did-mount
+     [_]
+     ((om/get-state owner :onChange)))
 
     om/IRenderState
     (render-state
@@ -42,7 +60,27 @@
     om/IInitState
     (init-state
       [_]
-      {:markdown ""})
+     {:markdown
+      ""
+
+      :onClick
+      (fn [_]
+        (let [c (util/html->canvas (om/get-node owner "viewer"))]
+          (go (->> (<! c)
+                   (util/canvas->pdf)
+                   (aset js/window "location")))))
+      :onMouseEnter
+      (fn [_]
+        (let [c (util/html->canvas (om/get-node owner "viewer"))]
+          (go (let [cvs (<! c)
+                    node (om/get-node owner "preview")]
+                (aset node "innerHTML" "")
+                (.appendChild node cvs)))))
+
+      :onMouseLeave
+      (fn [_]
+        (-> (om/get-node owner "preview")
+            (aset "innerHTML" "")))})
 
     om/IWillMount
     (will-mount
@@ -55,12 +93,19 @@
 
     om/IRenderState
     (render-state
-      [_ {:keys [markdown]}]
+      [_ {:keys [markdown onClick onMouseEnter onMouseLeave]}]
+     (dom/div
+      nil
       (dom/section
-       (clj->js {:className "viewer"
-;;                  :dangerouslySetInnerHTML {:__html (util/md->html markdown)}
-                 })
-       (pr-str (util/md->edn markdown))))))
+       (clj->js {:id "viewer"
+                 :ref "viewer"
+                 :dangerouslySetInnerHTML
+                 {:__html (util/md->html markdown)}}))
+      (dom/a #js {:href "javascript:void(0);"
+                  :onClick onClick
+                  :onMouseEnter onMouseEnter
+                  :onMouseLeave onMouseLeave} "show img")
+      (dom/div #js {:ref "preview"})))))
 
 (defn home-ui
   "Home page ui."
