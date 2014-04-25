@@ -1,0 +1,112 @@
+/* ========================================================================= */
+/* Resets */
+
+html, body {
+  background: white;
+  padding: 0px;
+  margin: 0px;
+}
+
+
+/* ========================================================================= */
+/* Main */
+
+#main {
+  padding: 10px;
+}
+
+#main h1.header {
+  padding: 3px;
+  border: solid 2px;
+  border-left: none;
+  border-right: none;
+}
+
+/* ========================================================================= */
+/* Editable */
+
+.editable {
+
+}
+
+/* ========================================================================= */
+/* Input-field */
+
+.input-field {
+
+}
+
+/* ========================================================================= */
+/* Checklist */
+
+.checklist a {
+  width: 30px;
+  border: solid;
+  display: inline-block;
+
+  font: bold 20pt Verdana;
+  text-align: center;
+}
+
+.checklist a.chosen {
+  color: green;
+}
+
+.checklist a.not-chosen {
+  color: green;
+  opacity: 0.3;
+}
+
+/* ========================================================================= */
+/* Board */
+
+#board {
+  border: 2px solid;
+  padding: 5px;
+  position: relative;
+  height: 500px;
+}
+
+#board > li {
+  padding: 5px;
+  border: dotted 2px;
+  display: inline-block;
+}
+
+/* ========================================================================= */
+/* App */
+
+.app > h2 {
+  margin: 0px 0px 10px 0px;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* Habits */
+
+.app.habits li.inactive {
+  color: silver;
+}
+
+.app.habits a.vote {
+  width: 20px;
+  border: solid 1px;
+  display: inline-block;
+
+  font: bold 12pt Verdana;
+  text-align: center;
+}
+
+.app.habits a.vote.positive {
+  color: green;
+}
+
+.app.habits a.vote.negative {
+  color: red;
+}
+
+.app.dailies li.inactive {
+  color: silver;
+}
+
+

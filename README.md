@@ -1,36 +1,61 @@
-# tekken
+# TEKKEN
 
-FIXME: description
+## Notes
 
-## Installation
+- Building the code
 
-Download from http://example.com/FIXME.
+* `lein cljsbuild once dev`
+* `lein cljsbuild auto dev`
 
-## Usage
+- Start the project
 
-FIXME: explanation
+* Build the code
+* `open resources/index.html`
 
-    $ java -jar tekken-0.1.0-standalone.jar [args]
+- Interop
 
-## Options
+```clojure
+;; Access global variables
+js/$
+js/document
+js/document.body.firstChild
 
-FIXME: listing of options this app accepts.
+;; Get property
+(.-firstChild js/document)
 
-## Examples
+;; Get/Set property
+(aget js/document "title")
+(aset js/document "title" "New")
 
-...
+;; Invoke method
+(js/alert 10)
+(. js/document getElementById "my-app")
+(. alert js/window "Call method.")
 
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+;; Make native js class
+(js/Array.)
+```
 
 ## License
 
-Copyright © 2014 FIXME
+The MIT License (MIT)
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Copyright REPL5 (c) 2014 <copyright holders>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

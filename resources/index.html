@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Tekken</title>
+        <link rel="stylesheet" type="text/css" href="theme.css">
+    </head>
+    <body>
+        <div id="main"></div>
+
+        <script src="jspdf.js"></script>
+        <script src="jspdf.plugin.addimage.js"></script>
+        <script src="html2canvas.js"></script>
+        <script src="jszip.min.js"></script>
+        <script src="markdown.js"></script>
+        <script src="react-0.8.0.js"></script>
+
+        <script src="../target/dev/goog/base.js" type="text/javascript"></script>
+        <script src="../target/main-debug.js" type="text/javascript"></script>
+        <script type="text/javascript">
+         goog.require('tekken.core');
+        </script>
+
+        <script>
+         (function () {
+             // Just some playground code
+             return;
+
+             function is_bigger(p) {
+                 return p.clientHeight > p.scrollHeight;
+             }
+
+             function genzip() {
+                 var zip = new JSZip();
+                 zip.file("Hello.txt", "Hello World\n");
+                 var img = zip.folder("images");
+                 /* img.file("smile.jpg", imgData, {base64: true}); */
+                 var content = zip.generate();
+                 location.href="data:application/zip;base64,"+content;
+             }
+
+             function prn() {
+                 var p = document.getElementById("printable");
+
+                 html2canvas(p, {
+                     onrendered: function(canvas) {
+                         var r = document.getElementById("result");
+                         var img = canvas.toDataURL("image/jpeg");
+                         window.pdf = function () {
+                             var doc = new jsPDF("p", "mm", "a4");
+                             doc.addImage(img, 'JPEG', 0, 0, 210, 297);
+                             window.location = doc.output('datauristring');
+                         }
+                         r.innerHTML = '<a href="'+img+'" download="img.jpeg"><img src="'+img+'"/></a>';
+                     }
+                 });
+             }
+
+             /* var mkd = document.getElementById("md-text").innerText;
+             mkd = mkd.replace(/^\+\s/gm, '+ [!]');
+
+             document.getElementById("printable").innerHTML = marked(mkd); */
+
+             document.getElementById("printable").innerHTML = Markdown.toHTML(document.getElementById("md-text").innerText);
+             prn();
+         });
+        </script>
+    </body>
+</html>
