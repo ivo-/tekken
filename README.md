@@ -4,13 +4,13 @@
 
 - Building the code
 
-* `lein cljsbuild once dev`
-* `lein cljsbuild auto dev`
+    * `lein cljsbuild once dev`
+    * `lein cljsbuild auto dev`
 
 - Start the project
 
-* Build the code
-* `open resources/index.html`
+    * Build the code
+    * `open resources/index.html`
 
 - Interop
 
