@@ -1,6 +1,5 @@
 ;; TODO:
 ;;
-;; - codemirror markdown editor
 ;; - proper mm styles
 ;; - generate printable html file (print view)
 ;; - options component
@@ -36,8 +35,61 @@
 ;; ============================================================================
 ;; Components
 
+(defn options
+  "Options component."
+  [app owner]
+  (reify
+    om/IInitState
+    (init-state
+     [_]
+     {:variants (:variants app)
+      :per-variant (:per-variant app)
+
+      :onTitle
+      (fn [e]
+        (om/update! app :title (.. e -target -value)))
+
+      :onChange
+      (fn [k e]
+        (let [value (.. e -target -value)]
+          (if (js/isNaN value)
+            (om/set-state! owner k "")
+            (do
+              (om/set-state! owner k value)
+              (om/update! app k value)))))
+      :onBlur
+      (fn [k e]
+        (om/set-state! owner k (k @app)))})
+
+    om/IRenderState
+    (render-state
+     [_ {:keys [per-variant variants onChange onBlur onTitle]}]
+     (dom/form
+      #js {:id "options"
+           :action "javascript: void(0);"}
+
+      (dom/label nil "Title: ")
+      (dom/input
+       #js {:type "text"
+            :value (:title app)
+            :onChange onTitle})
+
+      (dom/label nil "Number of variants: ")
+      (dom/input
+       #js {:type "text"
+            :value variants
+            :onBlur (partial onBlur :variants)
+            :onChange (partial onChange :variants)})
+
+      (dom/label nil "Questions per variant: ")
+      (dom/input
+       #js {:type "text"
+            :value per-variant
+            :onBlur (partial onBlur :per-variant)
+            :onChange (partial onChange :per-variant)})))))
+
 (defn editor
-  [{:keys [test-data]} owner]
+  [{:keys [test-data] :as app} owner]
   (reify
     om/IInitState
     (init-state
@@ -69,8 +121,8 @@
             :onChange onChange})
       (dom/hr nil)))))
 
-(defn viewer
-  "Test viewer component."
+(defn preview-button
+  "Preview button component."
   [{:keys [test-data]} owner]
   (reify
     om/IInitState
@@ -97,23 +149,27 @@
         (-> (om/get-node owner "preview")
             (aset "innerHTML" "")))})
 
-    om/IDidUpdate
-    (did-update
-     [_ _ _]
-     ;; Split .page into multiple a4 pages.
-     (js/pagify))
-
     om/IRenderState
     (render-state
      [_ {:keys [onClick onMouseEnter onMouseLeave]}]
      (dom/div
-      #js {:id "viewer"}
+      nil
       (dom/a #js {:href "javascript:void(0);"
                   :onClick onClick
                   :onMouseEnter onMouseEnter
                   :onMouseLeave onMouseLeave} "Preview/Download")
       (dom/div #js {:ref "preview"
-                    :className "preview"})
+                    :className "preview"})))))
+
+(defn viewer
+  "Test viewer component."
+  [{:keys [test-data]} owner]
+  (reify
+    om/IRender
+    (render
+     [_]
+     (dom/div
+      #js {:id "viewer"}
       (dom/section
        (clj->js {:ref "page"
                  :className "page"
@@ -129,7 +185,11 @@
      [_ {:keys [ch]}]
      (dom/section
       #js {:className "home"}
-      (om/build editor app)
+      (dom/div
+       #js {:id "left"}
+       (om/build editor app)
+       (om/build options (:test-data app))
+       (om/build preview-button app))
       (om/build viewer app)))))
 
 (defn tekken

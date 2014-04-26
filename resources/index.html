@@ -248,9 +248,13 @@
 
                 if (extra.children().length) {
                     extra.insertAfter(page);
-                    pagify();
                 }
+
+                requestAnimationFrame(pagify);
             };
+
+            // ...good enough for the demo and not breaking om's internal render loop
+            requestAnimationFrame(pagify);
 
             var get_pdf_pages = function(callback) {
                 var pages = $("#viewer section.page");

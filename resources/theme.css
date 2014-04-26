@@ -10,7 +10,7 @@ html, body {
   position: relative;
 }
 
-#editor {
+#left {
   width: 500px;
   height: 800px;
   overflow: hidden;
@@ -44,6 +44,10 @@ html, body {
 
 #viewer section.page header {
 
+}
+
+#options input {
+  display: block;
 }
 
 code {
