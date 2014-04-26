@@ -22,6 +22,8 @@ html, body {
   width: 95%;
   margin: 0 auto;
   padding: 0px;
+  width: 200px;
+  height: 300px;
 }
 
 #viewer {
@@ -37,6 +39,10 @@ html, body {
   height: 297mm;
   overflow: hidden;
   background: white;
+}
+
+#viewer section.page header {
+  padding: 0 10px;
 }
 
 code {

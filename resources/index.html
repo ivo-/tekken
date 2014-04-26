@@ -232,19 +232,34 @@
         </script>
 
         <script type="text/javascript">
-         var pagify = function(page) {
-             var page = $("#viewer section.page:last");
-             var extra = $("<section class='page'></section>");
+            var pagify = function(page) {
+                var page = $("#viewer section.page:last");
+                var extra = $("<section class='page'></section>");
 
-             while (page[0].clientHeight < page[0].scrollHeight) {
-                 extra.append(page.find("header:last").remove());
-             }
+                while (page[0].clientHeight < page[0].scrollHeight) {
+                    extra.append(page.find("header:last").remove());
+                }
 
-             if (extra.children().length) {
-                 extra.insertAfter(page);
-                 pagify();
-             }
-         }
+                if (extra.children().length) {
+                    extra.insertAfter(page);
+                    pagify();
+                }
+            };
+
+            var get_pdf_pages = function(callback) {
+                var pages = $("#viewer section.page");
+                var counter = 0;
+                var results = [];
+
+                return pages.map(function(){
+                    return html2canvas(this, {onrendered: function(canvas) {
+                        results.push(canvas);
+                        if (++counter == pages.length) {
+                            callback(results);
+                        }
+                    }});
+                });
+            };
         </script>
     </body>
 </html>

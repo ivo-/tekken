@@ -7,20 +7,21 @@
     (js/document.querySelector x)
     x))
 
-(defn html->canvas
-  [node]
-  (let [node ($ node)
-        ch (chan)]
-    (js/html2canvas
-     node
-     #js {:onrendered #(put! ch %)})
-    ch))
+(defn html->canvases
+  []
+  (let [ch (chan)]
+      (js/get_pdf_pages #(put! ch (vec %)))
+      ch))
 
-(defn canvas->pdf
-  [cvs]
-  (let [data-url (. cvs toDataURL "image/jpeg")
-        pdfdoc  (js/jsPDF. "p" "mm" "a4")]
-    (. pdfdoc addImage data-url 0 0 210 297)
+(defn canvases->pdf
+  [canvases]
+  (let [pdfdoc (js/jsPDF. "p" "mm" "a4")
+        lastcvs (last canvases)]
+    (doseq [cvs canvases]
+      (let [data-url (. cvs toDataURL "image/jpeg")]
+        (. pdfdoc addImage data-url 0 0 210 297)
+        (when-not (= cvs lastcvs)
+          (. pdfdoc addPage))))
     (. pdfdoc output "datauristring")))
 
 (defn make-zip
@@ -71,7 +72,7 @@
         parse-question
         (fn [data]
           {:text
-           [["header" (mapv pre-process-data data)]]
+           [(apply vector "header" (mapv pre-process-data data))]
 
            :ansers
            (->> data
@@ -90,9 +91,14 @@
          (mapv parse-question))))
 
 (defn edn->html
-  [data]
-  (->> (map :text data)
+  [{:keys [questions title]}]
+  (->> (map :text questions)
        (reduce concat)
+       (cons ["i" "Вариант: А"])
+       (cons ["i" "Група:...... "])
+       (cons ["i" "ФН:...... "])
+       (cons ["i" "Име:..........................................................................................."])
+       (cons ["h1" title])
        (cons "html")
        (clj->js)
        (.renderJsonML js/Markdown)))

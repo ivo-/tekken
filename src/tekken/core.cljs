@@ -1,6 +1,5 @@
 ;; TODO:
 ;;
-;; - pages
 ;; - codemirror markdown editor
 ;; - proper mm styles
 ;; - generate printable html file (print view)
@@ -20,7 +19,7 @@
     (:require  [tekken.util :as util]
                [om.core :as om :include-macros true]
                [om.dom :as dom :include-macros true]
-               [cljs.core.async :refer [put! <! >! chan map>]]))
+               [cljs.core.async :as async :refer [put! <! >! chan map>]]))
 
 ;; ============================================================================
 ;; Data
@@ -65,8 +64,6 @@
         (dom/textarea
           #js {:type "text"
                :ref "text"
-               :rows "20"
-               :cols "30"
                :value text
                :onChange onChange})))))
 
@@ -79,17 +76,19 @@
       [_]
      {:onClick
       (fn [_]
-        (let [ch (util/html->canvas (om/get-node owner "page"))]
-          (go (->> (<! ch)
-                   (util/canvas->pdf)
-                   (aset js/window "location")))))
+        (let [ch (util/html->canvases)]
+          (go
+           (let [canvases (<! ch)]
+             (aset js/window "location" (util/canvases->pdf canvases))))))
+
       :onMouseEnter
       (fn [_]
-        (let [ch (util/html->canvas (om/get-node owner "page"))]
-          (go (let [cvs (<! ch)
-                    node (om/get-node owner "preview")]
-                (aset node "innerHTML" "")
-                (.appendChild node cvs)))))
+        (let [ch (util/html->canvases)]
+          (go
+           (let [canvases (<! ch)
+                   node (om/get-node owner "preview")]
+               (aset node "innerHTML" "")
+               (doall (map #(.appendChild node %) canvases))))))
 
       :onMouseLeave
       (fn [_]
@@ -99,7 +98,7 @@
     om/IDidUpdate
     (did-update
      [_ _ _]
-     ;;
+     ;; Split .page into multiple a4 pages.
      (js/pagify))
 
     om/IRenderState
@@ -117,7 +116,7 @@
        (clj->js {:ref "page"
                  :className "page"
                  :dangerouslySetInnerHTML
-                 {:__html (util/edn->html (:questions test-data))}}))))))
+                 {:__html (util/edn->html test-data)}}))))))
 
 (defn home-ui
   "Home page ui."
