@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+function getArrayOfPixels (imageUrl) {
+    imageObj = document.getElementById("image");
+    imageObj.crossOrigin = "anonymous";
+
+    imageObj.onload = function() {
+        canvas = document.getElementById('canvas');
+        canvas.height = imageObj.height;
+        canvas.width = imageObj.width;
+        context = canvas.getContext("2d");
+        context.drawImage(imageObj, 0, 0);
+        imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        pixelArray = imageData.data;
+    };
+
+    imageObj.src = imageUrl;
+}
+function getPixelArray () {
+    var imageUrl = document.getElementById("imageUrl").value
+    getArrayOfPixels(imageUrl);
+}
+</script>
+</head>
+
+<body>
+    <input id='imageUrl'/>
+    <input type='button' value='OK' onclick="getPixelArray()"/><br><br>
+    <canvas id="canvas"></canvas>
+    <img id="image" style='display: none;'>
+</body>
+</html>
