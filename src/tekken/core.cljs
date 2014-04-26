@@ -118,9 +118,7 @@
        (.log js/console (str
                          (.-clientHeight page)
                          " | "
-                         (.-scrollHeight page))))
-     ;; TODO: Pagify
-     )
+                         (.-scrollHeight page)))))
 
     om/IRenderState
     (render-state

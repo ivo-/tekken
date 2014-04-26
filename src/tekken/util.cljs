@@ -43,30 +43,51 @@
   )
 
 (defn md->edn
-  "TODO: add a), b), c)"
-  "TODO: rewrite ast before html"
-  "TODO: split on ul"
+  "...where all the magic happens."
   [s]
-  (let [parse
+  (let [prefixes ["a)" "b)" "c)" "d)" "e)" "f)" "g)"]
+
+        hack-rx (js/RegExp. "\\[!]")
+        correct-rx (js/RegExp. "^\\+\\s" "gm")
+
+        pre-process-option
+        (fn [i [li text & more]]
+          (apply vector li
+                 (str (prefixes i)
+                      " "
+                      (if (string? text)
+                        (.replace text hack-rx "")
+                        text))
+                 more))
+
+        pre-process-data
+        (fn [[tag & content :as all]]
+          (case tag
+            "ul"
+            (apply vector tag (map-indexed pre-process-option content))
+
+            all))
+
+        parse-question
         (fn [data]
-          {:test data
+          {:test
+           (mapv pre-process-data data)
+
            :ansers
            (->> data
                 (filter #(= (first %) "ul"))
                 (first)
                 (rest)
-                (map #(if (.test (js/RegExp. "\\[!]") (second %))
-                        (vector (-> (second %)
-                                    (.replace (js/RegExp. "\\[!]") ""))
-                                true)
-                        (vector (second %) false))))})]
-    (->> (.replace s (js/RegExp. "^\\+\\s" "gm") "- [!]")
+                (map second)
+                (map #(.test hack-rx %)))})]
+    (->> (.replace s correct-rx "- [!]")
          (. js/Markdown toHTMLTree)
          (js->clj)
          (rest)
-         (partition-by #(= ["hr"] %))
-         (remove #(= [["hr"]] %))
-         (map parse))))
+         (partition-by #(= "ul" (first %)))
+         (partition-all 2)
+         (map (partial reduce concat))
+         (map parse-question))))
 
 (md->edn "
 Напишете някви лайна?
@@ -77,8 +98,22 @@
 
 - a
 - b
-+ c
++ `fasfasfsf`
 - d
 
----
+Напишете някви лайна?
+
+```
+(def a 10)
+```
+
+- a
+- b
++ c
+- d
 ")
+
+
+
+
+
