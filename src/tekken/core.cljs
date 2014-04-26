@@ -15,11 +15,11 @@
 ;;
 
 (ns tekken.core
-    (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-    (:require  [tekken.util :as util]
-               [om.core :as om :include-macros true]
-               [om.dom :as dom :include-macros true]
-               [cljs.core.async :as async :refer [put! <! >! chan map>]]))
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require  [tekken.util :as util]
+             [om.core :as om :include-macros true]
+             [om.dom :as dom :include-macros true]
+             [cljs.core.async :as async :refer [put! <! >! chan map>]]))
 
 ;; ============================================================================
 ;; Data
@@ -41,7 +41,7 @@
   (reify
     om/IInitState
     (init-state
-      [_]
+     [_]
      {:text template
       :onChange
       (fn [_]
@@ -57,15 +57,17 @@
 
     om/IRenderState
     (render-state
-      [_ {:keys [text onChange]}]
-      (dom/form
-        #js {:action "javascript: void(0);"
-             :id "editor"}
-        (dom/textarea
-          #js {:type "text"
-               :ref "text"
-               :value text
-               :onChange onChange})))))
+     [_ {:keys [text onChange]}]
+     (dom/form
+      #js {:action "javascript: void(0);"
+           :id "editor"}
+      (dom/hr nil)
+      (dom/textarea
+       #js {:id "code"
+            :ref "text"
+            :value text
+            :onChange onChange})
+      (dom/hr nil)))))
 
 (defn viewer
   "Test viewer component."
@@ -73,7 +75,7 @@
   (reify
     om/IInitState
     (init-state
-      [_]
+     [_]
      {:onClick
       (fn [_]
         (let [ch (util/html->canvases)]
@@ -86,9 +88,9 @@
         (let [ch (util/html->canvases)]
           (go
            (let [canvases (<! ch)
-                   node (om/get-node owner "preview")]
-               (aset node "innerHTML" "")
-               (doall (map #(.appendChild node %) canvases))))))
+                 node (om/get-node owner "preview")]
+             (aset node "innerHTML" "")
+             (doall (map #(.appendChild node %) canvases))))))
 
       :onMouseLeave
       (fn [_]
@@ -103,7 +105,7 @@
 
     om/IRenderState
     (render-state
-      [_ {:keys [onClick onMouseEnter onMouseLeave]}]
+     [_ {:keys [onClick onMouseEnter onMouseLeave]}]
      (dom/div
       #js {:id "viewer"}
       (dom/a #js {:href "javascript:void(0);"
@@ -134,11 +136,11 @@
   "The big boss that builds all the components together."
   []
   (om/root
-    (fn [app owner]
-      (dom/div
-        nil
-        (om/build home-ui app)))
-    data
-    {:target (. js/document (getElementById "main"))}))
+   (fn [app owner]
+     (dom/div
+      nil
+      (om/build home-ui app)))
+   data
+   {:target (. js/document (getElementById "main"))}))
 
 (tekken)
