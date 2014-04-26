@@ -10,7 +10,7 @@
 			return milimetres + 'mm';
 		}
 
-		function RenderAnswers (count) {
+		function RenderAnswers(count) {
 			for(i = 0; i < count; i++) {
 				answerRow = "<div class='answerRow rou" + i + "'></div>";
 				$('.a4').append(answerRow);
@@ -22,14 +22,44 @@
 			}
 		}
 
-		window.onload =function() {
+		function chooseSquareClass(digit) {
+			if (digit == 0)
+				return 'square';
+			return 'filled-square';
+		}
+
+		function RenderVariant(variant) {
+			$('.pos1').addClass(chooseSquareClass(Math.floor(variant/8)%2));
+			$('.pos2').addClass(chooseSquareClass(Math.floor(variant/4)%2));
+			$('.pos3').addClass(chooseSquareClass(Math.floor(variant/2)%2));
+			$('.pos4').addClass(chooseSquareClass(variant%2));
+		}
+
+		window.onload = function() {
 			RenderAnswers(22);
+			RenderVariant(11);
 		}
 	</script>
 	<style>
 	.a4 {
 		height: 297mm;
 		width:  210mm;
+	}
+	.pos1 {
+		margin-left: 30mm;
+		margin-top:  3mm;
+	}
+	.pos2 {
+		margin-left: 36mm;
+		margin-top:  3mm;
+	}
+	.pos3 {
+		margin-left: 42mm;
+		margin-top:  3mm;
+	}
+	.pos4 {
+		margin-left: 48mm;
+		margin-top:  3mm;
 	}
 	.top-left-corner {
 		position: absolute;
@@ -100,6 +130,18 @@
 		width:  4mm;
 		margin-top: 6mm;
 	}
+	.empty-square {
+		height: 4mm;
+		width: 4mm;
+		border: 1mm solid black;
+	}
+	.filled-square {
+		border: 1mm solid black;
+		background: black;
+		height: 4mm;
+		width:  4mm;
+		margin-top: 6mm;
+	}
 	.answerNumber {
 		height: 4mm;
 		width:  4mm;
@@ -107,7 +149,7 @@
 		font-weight: bold;
 		margin-left: 1mm;
 	}
-	.answerRow, .row1, .row2, .row3, .row4, .row5, .row6, .row7, .row8, .row9, .row10 {
+	.answerRow, .row1, .row2, .row3, .row4, .row5, .row6, .row7, .row8, .row9, .row10, .pos1, .pos2, .pos3, .pos4 {
 		position: absolute;
 	}
 	.row1 {
@@ -165,7 +207,13 @@
 		<img src = "marker.png" class = "top-center-corner"></img>
 		<img src = "marker.png" class = "top-right-corner"></img>
 	</div>
-	<h1 class='answerSheet'> ANSWER SHEET </h1>
+	<div>
+		<div class='pos1'></div>
+		<div class='pos2'></div>
+		<div class='pos3'></div>
+		<div class='pos4'></div>
+		<h1 class='answerSheet'> ANSWER SHEET </h1>
+	</div>
 	<div class="nameContainer">Name:</div>
 	<div class='fn-prompt'> Fill your faculty number: </div>
 	<div class='fn-container'>
