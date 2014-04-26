@@ -3,10 +3,8 @@
 ;; - pages
 ;; - codemirror markdown editor
 ;; - proper mm styles
-;; - demo test
 ;; - generate printable html file (print view)
 ;; - options component
-;; - keep ast in app state
 ;; - generate variants
 ;; - generate answer-sheets
 ;; - generate answer-keys
@@ -24,35 +22,34 @@
                [om.dom :as dom :include-macros true]
                [cljs.core.async :refer [put! <! >! chan map>]]))
 
+;; ============================================================================
+;; Data
+
+(def template
+  (.-innerText (util/$ "#template")))
+
 (defonce data
-  (atom {:test {}}))
+  (atom {:test-data {:title "Clojure II"
+                     :questions {}
+                     :variants 5
+                     :per-variant 15}}))
+
+;; ============================================================================
+;; Components
 
 (defn editor
-  [app owner {:keys [ch]}]
+  [{:keys [test-data]} owner]
   (reify
     om/IInitState
     (init-state
       [_]
-      {:text "
-Напишете някви лайна?
-
-```
-(def a 10)
-```
-
-- a
-- b
-+ c
-- d
-
----
-"
-       :onChange
-       (fn [_]
-         (let [value (->> (om/get-node owner "text")
-                          (.-value))]
-           (om/set-state! owner :text value)
-           (put! ch value)))})
+     {:text template
+      :onChange
+      (fn [_]
+        (let [value (->> (om/get-node owner "text")
+                         (.-value))]
+          (om/set-state! owner :text value)
+          (om/update! test-data :questions (util/md->edn value))))})
 
     om/IDidMount
     (did-mount
@@ -75,24 +72,21 @@
 
 (defn viewer
   "Test viewer component."
-  [app owner {:keys [ch]}]
+  [{:keys [test-data]} owner]
   (reify
     om/IInitState
     (init-state
       [_]
-     {:markdown
-      ""
-
-      :onClick
+     {:onClick
       (fn [_]
-        (let [c (util/html->canvas (om/get-node owner "page"))]
-          (go (->> (<! c)
+        (let [ch (util/html->canvas (om/get-node owner "page"))]
+          (go (->> (<! ch)
                    (util/canvas->pdf)
                    (aset js/window "location")))))
       :onMouseEnter
       (fn [_]
-        (let [c (util/html->canvas (om/get-node owner "page"))]
-          (go (let [cvs (<! c)
+        (let [ch (util/html->canvas (om/get-node owner "page"))]
+          (go (let [cvs (<! ch)
                     node (om/get-node owner "preview")]
                 (aset node "innerHTML" "")
                 (.appendChild node cvs)))))
@@ -102,27 +96,15 @@
         (-> (om/get-node owner "preview")
             (aset "innerHTML" "")))})
 
-    om/IWillMount
-    (will-mount
-      [_]
-     (go-loop
-      []
-      (let [v (<! ch)]
-        (om/set-state! owner :markdown v)
-        (recur))))
-
     om/IDidUpdate
     (did-update
      [_ _ _]
-     (let [page (om/get-node owner "page")]
-       (.log js/console (str
-                         (.-clientHeight page)
-                         " | "
-                         (.-scrollHeight page)))))
+     ;;
+     (js/pagify))
 
     om/IRenderState
     (render-state
-      [_ {:keys [markdown onClick onMouseEnter onMouseLeave]}]
+      [_ {:keys [onClick onMouseEnter onMouseLeave]}]
      (dom/div
       #js {:id "viewer"}
       (dom/a #js {:href "javascript:void(0);"
@@ -135,26 +117,19 @@
        (clj->js {:ref "page"
                  :className "page"
                  :dangerouslySetInnerHTML
-                 {:__html (-> markdown
-                              util/md->edn
-                              util/edn->html)}}))))))
+                 {:__html (util/edn->html (:questions test-data))}}))))))
 
 (defn home-ui
   "Home page ui."
   [app owner]
   (reify
-    om/IInitState
-    (init-state
-     [_]
-     {:ch (chan)})
-
     om/IRenderState
     (render-state
      [_ {:keys [ch]}]
      (dom/section
       #js {:className "home"}
-      (om/build editor app {:opts {:ch ch}})
-      (om/build viewer app {:opts {:ch ch}})))))
+      (om/build editor app)
+      (om/build viewer app)))))
 
 (defn tekken
   "The big boss that builds all the components together."

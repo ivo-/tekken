@@ -71,7 +71,7 @@
         parse-question
         (fn [data]
           {:text
-           (mapv pre-process-data data)
+           [["header" (mapv pre-process-data data)]]
 
            :ansers
            (->> data
@@ -87,34 +87,7 @@
          (partition-by #(= "ul" (first %)))
          (partition-all 2)
          (map (partial reduce concat))
-         (map parse-question))))
-
-
-
-
-(def e (md->edn "
-Напишете някви лайна?
-
-```
-(def a 10)
-```
-
-- a
-- b
-+ `fasfasfsf`
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-```
-
-- a
-- b
-+ c
-- d
-"))
+         (mapv parse-question))))
 
 (defn edn->html
   [data]
@@ -123,5 +96,3 @@
        (cons "html")
        (clj->js)
        (.renderJsonML js/Markdown)))
-
-(edn->html e)
