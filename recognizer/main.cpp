@@ -4,6 +4,7 @@
 #include "vimage.h"
 #include "perspective.h"
 #include "utils.h"
+#include "imageprocess.h"
 
 //////////////// Usage of this library - sample code:
 
@@ -59,20 +60,36 @@ int main(int argc, char** argv)
 {
 	if (!parseCmdLine(argc, argv)) return 1;
 	wxInitAllImageHandlers();
+	printf("Read\n");
 	wxImage img(WXSTRING(inputFile));
 	if (!img.Ok()) {
 		printf("Cannot open image!\n");
 		return 1;
 	}
 	VImage image(img);
+	printf("grayscale\n");
 	image.to_grayscale();
+	printf("falloff\n");
 	image.fix_falloff();
+	printf("Otsu\n");
 	int thresh = image.getOtsuThreshold();
 	
 	VImage colorful = image;
 	image.binarize(thresh);
 	
-	image.save(outFile);
+	printf("Markers\n");
+	vector<Pt> markers = findMarkers(image);
+	printf("%d markers\n", int(markers.size()));
+	REP(i, markers)
+		FOR(dy, 3) FOR(dx, 3)
+			image.putpixel(dx - 1 + markers[i].x, dy - 1 + markers[i].y, RGBA(0, 0xff, 0));
+			
+//	printf("Filterpoints\n");
+//	filterMarkers(markers);
+	
+	printf("Save\n");
+
+	//image.save(outFile);
 	/*
 	Pt corners[4]; // the four detected corners on the scanned image (holds vertices to an arbitrary quadrilateral)
 	Pt destpoints[4]; // where the four corners will be mapped onto (will hold vertices of some rectangle)

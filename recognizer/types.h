@@ -25,6 +25,11 @@ struct Pt {
 	{
 		x *= m; y *= m;
 	}
+	void operator /= (double m)
+	{
+		m = 1.0 / m;
+		x *= m; y *= m;
+	}
 	void operator += (const Pt& rhs)
 	{
 		x += rhs.x; y += rhs.y;
@@ -65,6 +70,11 @@ inline Pt operator / (const Pt& a, double m)
 inline Pt operator * (double m, const Pt& a)
 {
 	return Pt(a.x * m, a.y * m);
+}
+
+inline double dist(const Pt& a, const Pt& b)
+{
+	return (a - b).length();
 }
 
 
