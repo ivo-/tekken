@@ -46,6 +46,8 @@
 		<Unit filename="main.h" />
 		<Unit filename="perspective.cpp" />
 		<Unit filename="perspective.h" />
+		<Unit filename="sat.cpp" />
+		<Unit filename="sat.h" />
 		<Unit filename="types.h" />
 		<Unit filename="utils.h" />
 		<Unit filename="vimage.cpp" />

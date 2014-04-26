@@ -88,6 +88,9 @@ public:
 	void fix_falloff(void);
 	void resizeHalf(void);
 	
+	int sample(int x, int y, int size); // check if the square with length `size', centered at `x', `y' is mostly white or black
+	void flipX(); // flip image by X
+	
 	void save(const string& fn);
 };
 
