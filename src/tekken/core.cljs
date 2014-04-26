@@ -215,6 +215,7 @@
       #js {:className "home"}
       (dom/div
        #js {:id "left"}
+       (prn-str app)
        (om/build editor app)
        (om/build options (:test-data app))
        (om/build preview-button app))

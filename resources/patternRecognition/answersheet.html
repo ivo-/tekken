@@ -1,7 +1,65 @@
+	<script src="jquery.js"></script>
+	<script>
+		function question_margin_top(number) {
+			milimetres =  90 + Math.floor((number / 15)) * 60;
+			return milimetres + 'mm';
+		}
+
+		function question_margin_left(number) {
+			milimetres =  18 + 12 * (number % 15);
+			return milimetres + 'mm';
+		}
+
+		function RenderAnswers(count) {
+			for(i = 0; i < count; i++) {
+				answerRow = "<div class='answerRow rou" + i + "'></div>";
+				$('.a4').append(answerRow);
+				$('.rou' + i).css('margin-left', question_margin_left(i));
+				$('.rou' + i).css('margin-top', question_margin_top(i));
+				$('.rou' + i).append("<div class='answerNumber'>"+(i+1)+"</div>");
+				for (j = 0; j < 4; j++)
+				  $('.rou' + i).append("<div class='square'></div>");
+			}
+		}
+
+		function chooseSquareClass(digit) {
+			if (digit == 0)
+				return 'square';
+			return 'filled-square';
+		}
+
+		function RenderVariant(variant) {
+			$('.pos1').addClass(chooseSquareClass(Math.floor(variant/8)%2));
+			$('.pos2').addClass(chooseSquareClass(Math.floor(variant/4)%2));
+			$('.pos3').addClass(chooseSquareClass(Math.floor(variant/2)%2));
+			$('.pos4').addClass(chooseSquareClass(variant%2));
+		}
+
+		window.onload = function() {
+			RenderAnswers(22);
+			RenderVariant(11);
+		}
+	</script>
 	<style>
 	.a4 {
 		height: 297mm;
 		width:  210mm;
+	}
+	.pos1 {
+		margin-left: 30mm;
+		margin-top:  3mm;
+	}
+	.pos2 {
+		margin-left: 36mm;
+		margin-top:  3mm;
+	}
+	.pos3 {
+		margin-left: 42mm;
+		margin-top:  3mm;
+	}
+	.pos4 {
+		margin-left: 48mm;
+		margin-top:  3mm;
 	}
 	.top-left-corner {
 		position: absolute;
@@ -29,14 +87,14 @@
 		margin-left: 8mm;
 		height: 10mm;
 		width: 10mm;
-		margin-top: 133mm;
+		margin-top: 220mm;
 	}
 	.bottom-right-corner {
 		position: absolute;
 		height: 10mm;
 		width:  10mm;
 		margin-left: 192mm;
-		margin-top: 133mm;
+		margin-top: 220mm;
 	}
 	.imagesTop {
 		padding-bottom: 20mm;
@@ -72,14 +130,26 @@
 		width:  4mm;
 		margin-top: 6mm;
 	}
+	.empty-square {
+		height: 4mm;
+		width: 4mm;
+		border: 1mm solid black;
+	}
+	.filled-square {
+		border: 1mm solid black;
+		background: black;
+		height: 4mm;
+		width:  4mm;
+		margin-top: 6mm;
+	}
 	.answerNumber {
 		height: 4mm;
 		width:  4mm;
 		margin-top: 6mm;
-		font-weight: bold;	
+		font-weight: bold;
 		margin-left: 1mm;
 	}
-	.row1, .row2, .row3, .row4, .row5, .row6, .row7, .row8, .row9, .row10, .row11, .row12, .row13, .row14, .row15 {
+	.answerRow, .row1, .row2, .row3, .row4, .row5, .row6, .row7, .row8, .row9, .row10, .pos1, .pos2, .pos3, .pos4 {
 		position: absolute;
 	}
 	.row1 {
@@ -112,21 +182,6 @@
 	.row10 {
 		margin-left: 126mm;
 	}
-	.row11 {
-		margin-left: 138mm;
-	}
-	.row12 {
-		margin-left: 150mm;
-	}
-	.row13 {
-		margin-left: 162mm;
-	}
-	.row14 {
-		margin-left: 174mm;
-	}
-	.row15 {
-		margin-left: 186mm;
-	}
 	.fn-prompt {
 		position: absolute;
 		height: 15mm;
@@ -152,7 +207,13 @@
 		<img src = "marker.png" class = "top-center-corner"></img>
 		<img src = "marker.png" class = "top-right-corner"></img>
 	</div>
-	<h1 class='answerSheet'> ANSWER SHEET </h1>
+	<div>
+		<div class='pos1'></div>
+		<div class='pos2'></div>
+		<div class='pos3'></div>
+		<div class='pos4'></div>
+		<h1 class='answerSheet'> ANSWER SHEET </h1>
+	</div>
 	<div class="nameContainer">Name:</div>
 	<div class='fn-prompt'> Fill your faculty number: </div>
 	<div class='fn-container'>
@@ -229,113 +290,6 @@
 	</div>
 
 	<div class='answersPrompt'>Please carefully fill your answers:</div>
-	<div class='answersContainer'>
-		<div class='row1'>
-			<div class= 'answerNumber'>1</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row2'>
-			<div class= 'answerNumber'>2</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row3'>
-			<div class= 'answerNumber'>3</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row4'>
-			<div class= 'answerNumber'>4</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row5'>
-			<div class= 'answerNumber'>5</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row6'>
-			<div class= 'answerNumber'>6</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row7'>
-			<div class= 'answerNumber'>7</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row8'>
-			<div class= 'answerNumber'>8</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row9'>
-			<div class= 'answerNumber'>9</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row10'>
-			<div class= 'answerNumber'>10</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row11'>
-			<div class= 'answerNumber'>11</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row12'>
-			<div class= 'answerNumber'>12</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row13'>
-			<div class= 'answerNumber'>13</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row14'>
-			<div class= 'answerNumber'>14</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-		<div class='row15'>
-			<div class= 'answerNumber'>15</div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-			<div class= 'square'></div>
-		</div>
-	</div>
 	<div class='imagesBottom'>
 		<img src = "marker.png" class = "bottom-left-corner"></img>
 		<img src = "marker.png" class = "bottom-right-corner"></img>
