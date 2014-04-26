@@ -1,4 +1,4 @@
-#_(ns tekken.util
+(ns tekken.util
     (:require [cljs.core.async :refer [chan put!]]))
 
 (defn $

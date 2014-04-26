@@ -1,3 +1,22 @@
+;; TODO:
+;;
+;; - pages
+;; - codemirror markdown editor
+;; - proper mm styles
+;; - demo test
+;; - generate printable html file (print view)
+;; - options component
+;; - keep ast in app state
+;; - generate variants
+;; - generate answer-sheets
+;; - generate answer-keys
+;;
+;; - image recognition
+;;
+;; - generate checkui
+;; - generate statistics
+;;
+
 (ns tekken.core
     (:require-macros [cljs.core.async.macros :refer [go go-loop]])
     (:require  [tekken.util :as util]
