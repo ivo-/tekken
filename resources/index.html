@@ -7,7 +7,217 @@
     </head>
     <body>
         <div id="main"></div>
+        <script type="text/markdown" id="template">
+Напишете някви лайна?
 
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+
+Напишете някви лайна?
+
+```
+(def a 10)
+(for [x 10]
+  (inc x))
+```
+
+- a
+- b
++ c
+- d
+        </script>
+
+        <script src="jquery-2.1.0.js"></script>
         <script src="jspdf.js"></script>
         <script src="jspdf.plugin.addimage.js"></script>
         <script src="html2canvas.js"></script>
@@ -19,6 +229,22 @@
         <script src="../target/main-debug.js" type="text/javascript"></script>
         <script type="text/javascript">
          goog.require('tekken.core');
+        </script>
+
+        <script type="text/javascript">
+         var pagify = function(page) {
+             var page = $("#viewer section.page:last");
+             var extra = $("<section class='page'></section>");
+
+             while (page[0].clientHeight < page[0].scrollHeight) {
+                 extra.append(page.find("header:last").remove());
+             }
+
+             if (extra.children().length) {
+                 extra.insertAfter(page);
+                 pagify();
+             }
+         }
         </script>
     </body>
 </html>
