@@ -1,6 +1,6 @@
 ;; TODO:
 ;;
-;; - proper mm styles
+;; - delete old answers
 ;; - generate variants
 ;; - generate answer-sheets
 ;; - generate answer-keys
@@ -10,6 +10,7 @@
 ;;
 ;; Someday:
 ;;
+;; - diagrams
 ;; - image recognition
 ;; - generate printable html file (print view)
 ;;
@@ -215,7 +216,6 @@
       #js {:className "home"}
       (dom/div
        #js {:id "left"}
-       (prn-str app)
        (om/build editor app)
        (om/build options (:test-data app))
        (om/build preview-button app))
