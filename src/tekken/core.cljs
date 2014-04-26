@@ -164,9 +164,12 @@
       (dom/div #js {:ref "preview"
                     :className "preview"})))))
 
+
+
+
 (defn answers-key
   "For teachers."
-  [app owner]
+  [{:keys [questions]} owner]
   (reify
     om/IRender
     (render
@@ -174,11 +177,20 @@
      (dom/section
       #js {:id "answers-key"
            :className "answers"}
-      "Anwers key"))))
+      (apply dom/div #js {:className "row"}
+             (map-indexed
+               (fn [index {:keys [answers]}]
+                 (apply dom/div #js {:className "column"}
+                        (conj
+                          (map (fn [value]
+                                 (dom/div #js {:className (if value "filled")}))
+                               answers)
+                          (dom/div #js {:className "number"} (inc index)))))
+               questions))))))
 
 (defn answers-sheet
   "For students."
-  [app owner]
+  [{:keys [questions]} owner]
   (reify
     om/IRender
     (render
@@ -186,7 +198,14 @@
      (dom/section
       #js {:id "answers-sheet"
            :className "answers"}
-      "Anwers sheet"))))
+      (apply dom/div #js {:className "row"}
+             (map-indexed
+               (fn [index {:keys [answers]}]
+                 (apply dom/div #js {:className "column"}
+                        (conj
+                          (map (fn [_] (dom/div nil "")) answers)
+                          (dom/div #js {:className "number"} (inc index)))))
+               questions))))))
 
 (defn viewer
   "Test viewer component."
