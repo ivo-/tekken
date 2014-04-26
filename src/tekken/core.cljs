@@ -1,6 +1,6 @@
 ;; TODO:
 ;;
-;; - proper mm styles
+;; - delete old answers
 ;; - generate variants
 ;; - generate answer-sheets
 ;; - generate answer-keys
@@ -10,6 +10,7 @@
 ;;
 ;; Someday:
 ;;
+;; - diagrams
 ;; - image recognition
 ;; - generate printable html file (print view)
 ;;

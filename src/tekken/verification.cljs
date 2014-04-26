@@ -22,7 +22,7 @@
                 :title "Тест по clojure"}
     :variants [[1 2 3 4]
                [2 3 4 1]]
-    :user-solutions []}))
+    :solutions []}))
 
 ;; ==================================================================
 ;; Generators
@@ -45,7 +45,7 @@
    :variant 1
    :answers (gen-answers (:per-variant test-data))})
 
-(swap! app-state update-in [:user-solutions] conj (new-solution @app-state))
+(swap! app-state update-in [:solutions] conj (new-solution @app-state))
 
 ;; ==================================================================
 ;; Complements
@@ -75,6 +75,7 @@
     (init-state
      [_]
      {:text (:value answer)
+
       :onBlur
       (fn [e]
         (om/set-state! owner :text (:value @answer)))
@@ -119,7 +120,6 @@
 
       :onSolutionComplete
       (fn [e]
-        ;; Note: is it valid state?
         (put! ch :next))
 
       :onVerificationComplete
@@ -145,7 +145,8 @@
                   (range 1 (inc variants-count))))
 
       (apply dom/div nil
-             (om/build-all answer-input answers))
+             (om/build-all answer-input
+                           answers))
 
       (dom/button
        #js {:onClick onSolutionComplete}
@@ -156,7 +157,7 @@
        "End")))))
 
 (defn verification
-  [{:keys [user-solutions
+  [{:keys [solutions
            test-data] :as app} owner]
   (reify
     om/IInitState
@@ -172,7 +173,7 @@
          []
          (case (<! ch)
            :next
-           (om/transact! user-solutions #(conj % (new-solution @app)))
+           (om/transact! solutions #(conj % (new-solution @app)))
 
            :end
            (js/alert "fasfdsfd"))
@@ -182,9 +183,9 @@
     (render-state
      [_ {:keys [ch]}]
      (dom/div
-      nil
+      #js {:id "verification"}
       (om/build solution-form
-                (last user-solutions)
+                (last solutions)
                 {:opts {:ch ch
 
                         :variants-count
