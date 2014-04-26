@@ -85,13 +85,13 @@
 
       :onClick
       (fn [_]
-        (let [c (util/html->canvas (om/get-node owner "viewer"))]
+        (let [c (util/html->canvas (om/get-node owner "page"))]
           (go (->> (<! c)
                    (util/canvas->pdf)
                    (aset js/window "location")))))
       :onMouseEnter
       (fn [_]
-        (let [c (util/html->canvas (om/get-node owner "viewer"))]
+        (let [c (util/html->canvas (om/get-node owner "page"))]
           (go (let [cvs (<! c)
                     node (om/get-node owner "preview")]
                 (aset node "innerHTML" "")
@@ -111,21 +111,33 @@
         (om/set-state! owner :markdown v)
         (recur))))
 
+    om/IDidUpdate
+    (did-update
+     [_ _ _]
+     (let [page (om/get-node owner "page")]
+       (.log js/console (str
+                         (.-clientHeight page)
+                         " | "
+                         (.-scrollHeight page))))
+     ;; TODO: Pagify
+     )
+
     om/IRenderState
     (render-state
       [_ {:keys [markdown onClick onMouseEnter onMouseLeave]}]
      (dom/div
-      nil
-      (dom/section
-       (clj->js {:id "viewer"
-                 :ref "viewer"
-                 :dangerouslySetInnerHTML
-                 {:__html (util/md->html markdown)}}))
+      #js {:id "viewer"}
       (dom/a #js {:href "javascript:void(0);"
                   :onClick onClick
                   :onMouseEnter onMouseEnter
-                  :onMouseLeave onMouseLeave} "show img")
-      (dom/div #js {:ref "preview"})))))
+                  :onMouseLeave onMouseLeave} "Preview/Download")
+      (dom/div #js {:ref "preview"
+                    :className "preview"})
+      (dom/section
+       (clj->js {:ref "page"
+                 :className "page"
+                 :dangerouslySetInnerHTML
+                 {:__html (util/md->html markdown)}}))))))
 
 (defn home-ui
   "Home page ui."

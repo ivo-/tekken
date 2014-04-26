@@ -43,6 +43,9 @@
   )
 
 (defn md->edn
+  "TODO: add a), b), c)"
+  "TODO: rewrite ast before html"
+  "TODO: split on ul"
   [s]
   (let [parse
         (fn [data]
@@ -57,7 +60,7 @@
                                     (.replace (js/RegExp. "\\[!]") ""))
                                 true)
                         (vector (second %) false))))})]
-    (->> (.replace s (js/RegExp. "^\\+\\s" "gm") "+ [!]")
+    (->> (.replace s (js/RegExp. "^\\+\\s" "gm") "- [!]")
          (. js/Markdown toHTMLTree)
          (js->clj)
          (rest)
