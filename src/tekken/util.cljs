@@ -1,4 +1,4 @@
-(ns tekken.util
+#_(ns tekken.util
     (:require [cljs.core.async :refer [chan put!]]))
 
 (defn $
@@ -27,6 +27,21 @@
   [s]
   (. js/Markdown toHTML s))
 
+(defn make-zip
+  []
+
+;;   function genzip()
+;;   {
+;;    var zip = new JSZip();
+;;    zip.file("Hello.txt", "Hello World\n");
+;;    var img = zip.folder("images");
+;;    /* img.file("smile.jpg", imgData, {base64: true}); */
+;;    var content = zip.generate();
+;;    location.href="data:application/zip;base64,"+content;
+;;    }
+
+  )
+
 (defn md->edn
   [s]
   (let [parse
@@ -37,8 +52,12 @@
                 (filter #(= (first %) "ul"))
                 (first)
                 (rest)
-                (map #(vector (second %) false)))})]
-    (->> s
+                (map #(if (.test (js/RegExp. "\\[!]") (second %))
+                        (vector (-> (second %)
+                                    (.replace (js/RegExp. "\\[!]") ""))
+                                true)
+                        (vector (second %) false))))})]
+    (->> (.replace s (js/RegExp. "^\\+\\s" "gm") "+ [!]")
          (. js/Markdown toHTMLTree)
          (js->clj)
          (rest)

@@ -44,7 +44,8 @@
     (render-state
       [_ {:keys [text onChange]}]
       (dom/form
-        #js {:action "javascript: void(0);"}
+        #js {:action "javascript: void(0);"
+             :id "editor"}
         (dom/textarea
           #js {:type "text"
                :ref "text"

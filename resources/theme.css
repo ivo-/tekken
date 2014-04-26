@@ -7,3 +7,21 @@ html, body {
 textarea {
 
 }
+
+#editor, #viewer {
+  width: 110mm; /* TODO: */
+  height: 297mm;
+  display: inline-block;
+
+  float: left;
+  margin-right: 10px;
+  background: white;
+}
+
+ul {
+  list-style: none;
+}
+
+code {
+  white-space: pre;
+}
