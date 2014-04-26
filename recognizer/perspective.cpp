@@ -1,12 +1,5 @@
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <algorithm>
-#include <vector>
-
-using namespace std;
 #include "types.h"
-
+#include "vimage.h"
 
 enum {
 	ERR_DIM = -100,
@@ -112,20 +105,3 @@ VImage transformPerspective(const VImage& src, Matrix m, int width, int height)
 }
 
 
-//////////////// Usage of this library - sample code:
-
-const int TWIDTH = 800;
-const int THEIGHT = 400;
-
-int main(void)
-{
-	Pt corners[4]; // the four detected corners on the scanned image (holds vertices to an arbitrary quadrilateral)
-	VImage* image; // input scanned image
-	Pt destpoints[4]; // where the four corners will be mapped onto (will hold vertices of some rectangle)
-	destpoints[0] = Pt(0, 0);
-	destpoints[1] = Pt(TWIDTH, 0);
-	destpoints[2] = Pt(0, THEIGHT);
-	destpoints[3] = Pt(TWIDTH, THEIGHT);
-	auto transformMatrix = getPerspectiveTransform(corners, destpoints);
-	auto perspectived = new VImage(transformPerspective(*image, transformMatrix, TWIDTH, THEIGHT));
-}
