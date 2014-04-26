@@ -17,6 +17,7 @@
 (ns tekken.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require  [tekken.util :as util]
+             [tekken.verification :as verification]
              [om.core :as om :include-macros true]
              [om.dom :as dom :include-macros true]
              [cljs.core.async :as async :refer [put! <! >! chan map>]]))

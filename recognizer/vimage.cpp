@@ -6,7 +6,7 @@
 
 void VImage::fix_falloff(void)
 {
-	const int N = 10;
+	const int N = 24;
 	double intensity[N][N] = {};
 	int alle[N][N] = {};
 	FOR(y, h) FOR(x, w) {
