@@ -2,7 +2,6 @@
 ;;
 ;; - proper mm styles
 ;; - generate variants
-;; - question numbers
 ;; - generate answer-sheets
 ;; - generate answer-keys
 ;;
@@ -163,6 +162,30 @@
       (dom/div #js {:ref "preview"
                     :className "preview"})))))
 
+(defn answers-key
+  "For teachers."
+  [app owner]
+  (reify
+    om/IRender
+    (render
+     [_]
+     (dom/section
+      #js {:id "answers-key"
+           :className "answers"}
+      "Anwers key"))))
+
+(defn answers-sheet
+  "For students."
+  [app owner]
+  (reify
+    om/IRender
+    (render
+     [_]
+     (dom/section
+      #js {:id "answers-sheet"
+           :className "answers"}
+      "Anwers sheet"))))
+
 (defn viewer
   "Test viewer component."
   [{:keys [test-data]} owner]
@@ -176,7 +199,9 @@
        (clj->js {:ref "page"
                  :className "page"
                  :dangerouslySetInnerHTML
-                 {:__html (util/edn->html test-data)}}))))))
+                 {:__html (util/edn->html test-data)}}))
+      (om/build answers-key test-data)
+      (om/build answers-sheet test-data)))))
 
 (defn home-ui
   "Home page ui."

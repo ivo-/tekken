@@ -233,11 +233,11 @@
 
         <script type="text/javascript">
             var pagify = function(page) {
-                var page = $("#viewer section.page:last");
+                var page = $("#viewer section.page:last:not(.answers)");
                 var extra = $("<section class='page'></section>");
 
                 while (page[0].clientHeight < page[0].scrollHeight) {
-                    extra.append(page.find("header:last").remove());
+                    extra.prepend(page.find("header:last").remove());
                 }
 
                 if (extra.children().length) {
