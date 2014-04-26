@@ -4,37 +4,51 @@
             [om.dom :as dom :include-macros true]
             [cljs.core.async :as async :refer [put! <! >! chan map>]]))
 
-(defn variants [app]
-  (-> app
-      (get-in [:test :per-variant])
-      (range)))
-
-(defn rand-answer
-  []
-  {:value ""})
-
-(defn new-solution
-  []
-  {:id (apply str (take 5 (repeatedly #(rand-int 2))))
-   :variant (rand-int 2)
-   :answers (mapv rand-answer (range 15))})
+;; ==================================================================
+;; State
 
 (def app-state
   (atom
-   {:variants [[1 2 3 4]
+   {:test-data {:questions [{:text "Q1"
+                             :answers [true false false false]}
+                            {:text "Q2"
+                             :answers [false true false false]}
+                            {:text "Q3"
+                             :answers [false false true false]}
+                            {:text "Q4"
+                             :answers [false false false true]}]
+                :per-variant 4
+                :variants 5
+                :title "Тест по clojure"}
+    :variants [[1 2 3 4]
                [2 3 4 1]]
-    :test {:questions [{:text "Q1"
-                        :answers [true false false false]}
-                       {:text "Q2"
-                        :answers [false true false false]}
-                       {:text "Q3"
-                        :answers [false false true false]}
-                       {:text "Q4"
-                        :answers [false false false true]}]
-           :per-variant 15
-           :variants 5
-           :title "Тест по clojure"}
-    :user-solutions [(new-solution)]}))
+    :user-solutions []}))
+
+;; ==================================================================
+;; Generators
+
+(defn new-answer
+  []
+  {:value ""})
+
+(defn gen-name
+  []
+  (apply str (take 5 (repeatedly #(rand-int 2)))))
+
+(defn gen-answers
+  [n]
+  (mapv new-answer (range n)))
+
+(defn new-solution
+  [{:keys [test-data]}]
+  {:id (gen-name)
+   :variant 1
+   :answers (gen-answers (:per-variant test-data))})
+
+(swap! app-state update-in [:user-solutions] conj (new-solution @app-state))
+
+;; ==================================================================
+;; Complements
 
 (def letter->num
   #(case %
@@ -84,7 +98,11 @@
             :onChange onChange}))))
 
 (defn solution-form
-  [{:keys [id variant answers] :as solution} owner {:keys [ch]}]
+  [{:keys [id variant answers] :as solution}
+   owner
+   {:keys [ch
+           variants-count
+           questions-count]}]
   (reify
     om/IInitState
     (init-state
@@ -102,11 +120,15 @@
       :onSolutionComplete
       (fn [e]
         ;; Note: is it valid state?
-        (put! ch true))})
+        (put! ch :next))
+
+      :onVerificationComplete
+      (fn [e]
+        (put! ch :end))})
 
     om/IRenderState
     (render-state
-     [_ {:keys [onIdChange onVariantChange onSolutionComplete]}]
+     [_ {:keys [onIdChange onVariantChange onSolutionComplete onVerificationComplete]}]
      (dom/div
       nil
       (dom/div
@@ -120,17 +142,22 @@
              #js {:onChange onVariantChange
                   :value variant}
              (map #(dom/option #js {:value %} %)
-                  (range 1 3))) ;; TODO:
+                  (range 1 (inc variants-count))))
 
       (apply dom/div nil
              (om/build-all answer-input answers))
 
       (dom/button
        #js {:onClick onSolutionComplete}
-       "Next")))))
+       "Next")
+
+      (dom/button
+       #js {:onClick onVerificationComplete}
+       "End")))))
 
 (defn verification
-  [{:keys [user-solutions] :as app} owner]
+  [{:keys [user-solutions
+           test-data] :as app} owner]
   (reify
     om/IInitState
     (init-state
@@ -143,8 +170,12 @@
       (let [{:keys [ch]} (om/get-state owner)]
         (go-loop
          []
-         (<! ch)
-         (om/transact! user-solutions #(conj % (new-solution)))
+         (case (<! ch)
+           :next
+           (om/transact! user-solutions #(conj % (new-solution @app)))
+
+           :end
+           (js/alert "fasfdsfd"))
          (recur))))
 
     om/IRenderState
@@ -152,10 +183,15 @@
      [_ {:keys [ch]}]
      (dom/div
       nil
-      (pr-str user-solutions)
       (om/build solution-form
                 (last user-solutions)
-                {:opts {:ch ch}})))))
+                {:opts {:ch ch
+
+                        :variants-count
+                        (:variants test-data)
+
+                        :questions-count
+                        (:per-variant test-data)}})))))
 
 (om/root
  verification
