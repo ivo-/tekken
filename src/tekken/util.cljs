@@ -23,10 +23,6 @@
     (. pdfdoc addImage data-url 0 0 210 297)
     (. pdfdoc output "datauristring")))
 
-(defn md->html
-  [s]
-  (. js/Markdown toHTML s))
-
 (defn make-zip
   []
 
@@ -41,6 +37,10 @@
 ;;    }
 
   )
+
+(defn md->html
+  [s]
+  (. js/Markdown toHTML s))
 
 (defn md->edn
   "...where all the magic happens."
@@ -70,7 +70,7 @@
 
         parse-question
         (fn [data]
-          {:test
+          {:text
            (mapv pre-process-data data)
 
            :ansers
@@ -89,7 +89,10 @@
          (map (partial reduce concat))
          (map parse-question))))
 
-(md->edn "
+
+
+
+(def e (md->edn "
 Напишете някви лайна?
 
 ```
@@ -111,9 +114,14 @@
 - b
 + c
 - d
-")
+"))
 
+(defn edn->html
+  [data]
+  (->> (map :text data)
+       (reduce concat)
+       (cons "html")
+       (clj->js)
+       (.renderJsonML js/Markdown)))
 
-
-
-
+(edn->html e)

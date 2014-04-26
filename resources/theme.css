@@ -42,3 +42,7 @@ html, body {
 code {
   white-space: pre;
 }
+
+ul {
+    list-style: none;
+}

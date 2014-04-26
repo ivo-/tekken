@@ -25,7 +25,7 @@
                [cljs.core.async :refer [put! <! >! chan map>]]))
 
 (defonce data
-  (atom {}))
+  (atom {:test {}}))
 
 (defn editor
   [app owner {:keys [ch]}]
@@ -135,7 +135,9 @@
        (clj->js {:ref "page"
                  :className "page"
                  :dangerouslySetInnerHTML
-                 {:__html (util/md->html markdown)}}))))))
+                 {:__html (-> markdown
+                              util/md->edn
+                              util/edn->html)}}))))))
 
 (defn home-ui
   "Home page ui."
