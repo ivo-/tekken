@@ -1,0 +1,249 @@
+	<script src="jquery.js"></script>
+	<script>
+		function question_margin_top(number) {
+			milimetres =  90 + Math.floor((number / 15)) * 60;
+			return milimetres + 'mm';
+		}
+
+		function question_margin_left(number) {
+			milimetres =  18 + 12 * (number % 15);
+			return milimetres + 'mm';
+		}
+
+		function RenderAnswers (count) {
+			for(i = 0; i < count; i++) {
+				answerRow = "<div class='answerRow rou" + i + "'></div>";
+				$('.a4').append(answerRow);
+				$('.rou' + i).css('margin-left', question_margin_left(i));
+				$('.rou' + i).css('margin-top', question_margin_top(i));
+				$('.rou' + i).append("<div class='answerNumber'>"+(i+1)+"</div>");
+				for (j = 0; j < 4; j++)
+				  $('.rou' + i).append("<div class='square'></div>");
+			}
+		}
+
+		window.onload =function() {
+			RenderAnswers(22);
+		}
+	</script>
+	<style>
+	.a4 {
+		height: 297mm;
+		width:  210mm;
+	}
+	.top-left-corner {
+		position: absolute;
+		margin-top: 8mm;
+		margin-left: 8mm;
+		height: 10mm;
+		width: 10mm;
+	}
+	.top-center-corner {
+		position: absolute;
+		margin-top: 8mm;
+		margin-left: 100mm;
+		height: 10mm;
+		width: 10mm;
+	}
+	.top-right-corner {
+		position: absolute;
+		margin-top: 8mm;
+		height: 10mm;
+		width:  10mm;
+		margin-left: 192mm;
+	}
+	.bottom-left-corner {
+		position: absolute;
+		margin-left: 8mm;
+		height: 10mm;
+		width: 10mm;
+		margin-top: 220mm;
+	}
+	.bottom-right-corner {
+		position: absolute;
+		height: 10mm;
+		width:  10mm;
+		margin-left: 192mm;
+		margin-top: 220mm;
+	}
+	.imagesTop {
+		padding-bottom: 20mm;
+	}
+	.answerSheet {
+		text-align: center;
+		width: 170mm;
+		margin-left: 18mm;
+		padding-bottom: 5mm;
+	}
+	.nameContainer {
+		border: 1mm solid black;
+		margin-left: 18mm;
+		height: 7mm;
+		width: 170mm;
+		padding-left: 2mm;
+		padding-top: 1mm;
+		font-weight: bold;
+	}
+	.answersContainer {
+		margin-top: 90mm;
+	}
+	.answersPrompt {
+		position: absolute;
+		margin-top: 80mm;
+		font-size: 20;
+		font-weight: bold;
+		margin-left: 20mm;
+	}
+	.square {
+		border: 1mm solid black;
+		height: 4mm;
+		width:  4mm;
+		margin-top: 6mm;
+	}
+	.answerNumber {
+		height: 4mm;
+		width:  4mm;
+		margin-top: 6mm;
+		font-weight: bold;
+		margin-left: 1mm;
+	}
+	.answerRow, .row1, .row2, .row3, .row4, .row5, .row6, .row7, .row8, .row9, .row10 {
+		position: absolute;
+	}
+	.row1 {
+		margin-left: 18mm;
+	}
+	.row2 {
+		margin-left: 30mm;
+	}
+	.row3 {
+		margin-left: 42mm;
+	}
+	.row4 {
+		margin-left: 54mm;
+	}
+	.row5 {
+		margin-left: 66mm;
+	}
+	.row6 {
+		margin-left: 78mm;
+	}
+	.row7 {
+		margin-left: 90mm;
+	}
+	.row8 {
+		margin-left: 102mm;
+	}
+	.row9 {
+		margin-left: 114mm;
+	}
+	.row10 {
+		margin-left: 126mm;
+	}
+	.fn-prompt {
+		position: absolute;
+		height: 15mm;
+		text-align: center;
+		margin-left: 20mm;
+		font-size: 20;
+		font-weight: bold;
+		margin-top: 5mm;
+	}
+	.fn-container {
+		position: absolute;
+		margin-top: 10mm;
+	}
+	.number-fn {
+		text-align: center;
+		vertical-align: middle;
+		font-size: 13;
+	}
+</style>
+<div class= 'a4'>
+	<div class='imagesTop'>
+		<img src = "marker.png" class = "top-left-corner"></img>
+		<img src = "marker.png" class = "top-center-corner"></img>
+		<img src = "marker.png" class = "top-right-corner"></img>
+	</div>
+	<h1 class='answerSheet'> ANSWER SHEET </h1>
+	<div class="nameContainer">Name:</div>
+	<div class='fn-prompt'> Fill your faculty number: </div>
+	<div class='fn-container'>
+		<div class='row1'>
+			<div class= 'square number-fn'>0</div>
+			<div class= 'square number-fn'>0</div>
+			<div class= 'square number-fn'>0</div>
+			<div class= 'square number-fn'>0</div>
+			<div class= 'square number-fn'>0</div>
+		</div>
+		<div class='row2'>
+			<div class= 'square number-fn'>1</div>
+			<div class= 'square number-fn'>1</div>
+			<div class= 'square number-fn'>1</div>
+			<div class= 'square number-fn'>1</div>
+			<div class= 'square number-fn'>1</div>
+		</div>
+		<div class='row3'>
+			<div class= 'square number-fn'>2</div>
+			<div class= 'square number-fn'>2</div>
+			<div class= 'square number-fn'>2</div>
+			<div class= 'square number-fn'>2</div>
+			<div class= 'square number-fn'>2</div>
+		</div>
+		<div class='row4'>
+			<div class= 'square number-fn'>3</div>
+			<div class= 'square number-fn'>3</div>
+			<div class= 'square number-fn'>3</div>
+			<div class= 'square number-fn'>3</div>
+			<div class= 'square number-fn'>3</div>
+		</div>
+		<div class='row5'>
+			<div class= 'square number-fn'>4</div>
+			<div class= 'square number-fn'>4</div>
+			<div class= 'square number-fn'>4</div>
+			<div class= 'square number-fn'>4</div>
+			<div class= 'square number-fn'>4</div>
+		</div>
+		<div class='row6'>
+			<div class= 'square number-fn'>5</div>
+			<div class= 'square number-fn'>5</div>
+			<div class= 'square number-fn'>5</div>
+			<div class= 'square number-fn'>5</div>
+			<div class= 'square number-fn'>5</div>
+		</div>
+		<div class='row7'>
+			<div class= 'square number-fn'>6</div>
+			<div class= 'square number-fn'>6</div>
+			<div class= 'square number-fn'>6</div>
+			<div class= 'square number-fn'>6</div>
+			<div class= 'square number-fn'>6</div>
+		</div>
+		<div class='row8'>
+			<div class= 'square number-fn'>7</div>
+			<div class= 'square number-fn'>7</div>
+			<div class= 'square number-fn'>7</div>
+			<div class= 'square number-fn'>7</div>
+			<div class= 'square number-fn'>7</div>
+		</div>
+		<div class='row9'>
+			<div class= 'square number-fn'>8</div>
+			<div class= 'square number-fn'>8</div>
+			<div class= 'square number-fn'>8</div>
+			<div class= 'square number-fn'>8</div>
+			<div class= 'square number-fn'>8</div>
+		</div>
+		<div class='row10'>
+			<div class= 'square number-fn'>9</div>
+			<div class= 'square number-fn'>9</div>
+			<div class= 'square number-fn'>9</div>
+			<div class= 'square number-fn'>9</div>
+			<div class= 'square number-fn'>9</div>
+		</div>
+	</div>
+
+	<div class='answersPrompt'>Please carefully fill your answers:</div>
+	<div class='imagesBottom'>
+		<img src = "marker.png" class = "bottom-left-corner"></img>
+		<img src = "marker.png" class = "bottom-right-corner"></img>
+	</div>
+</div>

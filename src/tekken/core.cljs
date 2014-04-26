@@ -1,58 +1,107 @@
 ;; TODO:
 ;;
-;; - pages
-;; - codemirror markdown editor
 ;; - proper mm styles
-;; - demo test
-;; - generate printable html file (print view)
-;; - options component
-;; - keep ast in app state
 ;; - generate variants
 ;; - generate answer-sheets
 ;; - generate answer-keys
 ;;
-;; - image recognition
-;;
 ;; - generate checkui
 ;; - generate statistics
 ;;
+;; Someday:
+;;
+;; - image recognition
+;; - generate printable html file (print view)
+;;
 
 (ns tekken.core
-    (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-    (:require  [tekken.util :as util]
-               [om.core :as om :include-macros true]
-               [om.dom :as dom :include-macros true]
-               [cljs.core.async :refer [put! <! >! chan map>]]))
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require  [tekken.util :as util]
+             [om.core :as om :include-macros true]
+             [om.dom :as dom :include-macros true]
+             [cljs.core.async :as async :refer [put! <! >! chan map>]]))
+
+;; ============================================================================
+;; Data
+
+(def template
+  (.-innerText (util/$ "#template")))
 
 (defonce data
-  (atom {}))
+  (atom {:test-data {:title "Clojure II"
+                     :questions {}
+                     :variants 5
+                     :per-variant 15}}))
 
-(defn editor
-  [app owner {:keys [ch]}]
+;; ============================================================================
+;; Components
+
+(defn options
+  "Options component."
+  [app owner]
   (reify
     om/IInitState
     (init-state
-      [_]
-      {:text "
-Напишете някви лайна?
+     [_]
+     {:variants (:variants app)
+      :per-variant (:per-variant app)
 
-```
-(def a 10)
-```
+      :onTitle
+      (fn [e]
+        (om/update! app :title (.. e -target -value)))
 
-- a
-- b
-+ c
-- d
+      :onChange
+      (fn [k e]
+        (let [value (.. e -target -value)]
+          (if (js/isNaN value)
+            (om/set-state! owner k "")
+            (do
+              (om/set-state! owner k value)
+              (om/update! app k value)))))
+      :onBlur
+      (fn [k e]
+        (om/set-state! owner k (k @app)))})
 
----
-"
-       :onChange
-       (fn [_]
-         (let [value (->> (om/get-node owner "text")
-                          (.-value))]
-           (om/set-state! owner :text value)
-           (put! ch value)))})
+    om/IRenderState
+    (render-state
+     [_ {:keys [per-variant variants onChange onBlur onTitle]}]
+     (dom/form
+      #js {:id "options"
+           :action "javascript: void(0);"}
+
+      (dom/label nil "Title: ")
+      (dom/input
+       #js {:type "text"
+            :value (:title app)
+            :onChange onTitle})
+
+      (dom/label nil "Number of variants: ")
+      (dom/input
+       #js {:type "text"
+            :value variants
+            :onBlur (partial onBlur :variants)
+            :onChange (partial onChange :variants)})
+
+      (dom/label nil "Questions per variant: ")
+      (dom/input
+       #js {:type "text"
+            :value per-variant
+            :onBlur (partial onBlur :per-variant)
+            :onChange (partial onChange :per-variant)})))))
+
+(defn editor
+  [{:keys [test-data] :as app} owner]
+  (reify
+    om/IInitState
+    (init-state
+     [_]
+     {:text template
+      :onChange
+      (fn [_]
+        (let [value (->> (om/get-node owner "text")
+                         (.-value))]
+          (om/set-state! owner :text value)
+          (om/update! test-data :questions (util/md->edn value))))})
 
     om/IDidMount
     (did-mount
@@ -61,108 +110,124 @@
 
     om/IRenderState
     (render-state
-      [_ {:keys [text onChange]}]
-      (dom/form
-        #js {:action "javascript: void(0);"
-             :id "editor"}
-        (dom/textarea
-          #js {:type "text"
-               :ref "text"
-               :rows "20"
-               :cols "30"
-               :value text
-               :onChange onChange})))))
+     [_ {:keys [text onChange]}]
+     (dom/form
+      #js {:action "javascript: void(0);"
+           :id "editor"}
+      (dom/hr nil)
+      (dom/textarea
+       #js {:id "code"
+            :ref "text"
+            :value text
+            :onChange onChange})
+      (dom/hr nil)))))
 
-(defn viewer
-  "Test viewer component."
-  [app owner {:keys [ch]}]
+(defn preview-button
+  "Preview button component."
+  [{:keys [test-data]} owner]
   (reify
     om/IInitState
     (init-state
-      [_]
-     {:markdown
-      ""
-
-      :onClick
+     [_]
+     {:onClick
       (fn [_]
-        (let [c (util/html->canvas (om/get-node owner "page"))]
-          (go (->> (<! c)
-                   (util/canvas->pdf)
-                   (aset js/window "location")))))
+        (let [ch (util/html->canvases)]
+          (go
+           (let [canvases (<! ch)]
+             (aset js/window "location" (util/canvases->pdf canvases))))))
+
       :onMouseEnter
       (fn [_]
-        (let [c (util/html->canvas (om/get-node owner "page"))]
-          (go (let [cvs (<! c)
-                    node (om/get-node owner "preview")]
-                (aset node "innerHTML" "")
-                (.appendChild node cvs)))))
+        #_(let [ch (util/html->canvases)]
+          (go
+           (let [canvases (<! ch)
+                 node (om/get-node owner "preview")]
+             (aset node "innerHTML" "")
+             (doall (map #(.appendChild node %) canvases))))))
 
       :onMouseLeave
       (fn [_]
-        (-> (om/get-node owner "preview")
+        #_(-> (om/get-node owner "preview")
             (aset "innerHTML" "")))})
-
-    om/IWillMount
-    (will-mount
-      [_]
-     (go-loop
-      []
-      (let [v (<! ch)]
-        (om/set-state! owner :markdown v)
-        (recur))))
-
-    om/IDidUpdate
-    (did-update
-     [_ _ _]
-     (let [page (om/get-node owner "page")]
-       (.log js/console (str
-                         (.-clientHeight page)
-                         " | "
-                         (.-scrollHeight page)))))
 
     om/IRenderState
     (render-state
-      [_ {:keys [markdown onClick onMouseEnter onMouseLeave]}]
+     [_ {:keys [onClick onMouseEnter onMouseLeave]}]
      (dom/div
-      #js {:id "viewer"}
+      nil
       (dom/a #js {:href "javascript:void(0);"
                   :onClick onClick
                   :onMouseEnter onMouseEnter
-                  :onMouseLeave onMouseLeave} "Preview/Download")
+                  :onMouseLeave onMouseLeave} "Download")
       (dom/div #js {:ref "preview"
-                    :className "preview"})
+                    :className "preview"})))))
+
+(defn answers-key
+  "For teachers."
+  [app owner]
+  (reify
+    om/IRender
+    (render
+     [_]
+     (dom/section
+      #js {:id "answers-key"
+           :className "answers"}
+      "Anwers key"))))
+
+(defn answers-sheet
+  "For students."
+  [app owner]
+  (reify
+    om/IRender
+    (render
+     [_]
+     (dom/section
+      #js {:id "answers-sheet"
+           :className "answers"}
+      "Anwers sheet"))))
+
+(defn viewer
+  "Test viewer component."
+  [{:keys [test-data]} owner]
+  (reify
+    om/IRender
+    (render
+     [_]
+     (dom/div
+      #js {:id "viewer"}
       (dom/section
        (clj->js {:ref "page"
                  :className "page"
                  :dangerouslySetInnerHTML
-                 {:__html (util/md->html markdown)}}))))))
+                 {:__html (util/edn->html test-data)}}))
+      (om/build answers-key test-data)
+      (om/build answers-sheet test-data)))))
 
 (defn home-ui
   "Home page ui."
   [app owner]
   (reify
-    om/IInitState
-    (init-state
-     [_]
-     {:ch (chan)})
-
     om/IRenderState
     (render-state
      [_ {:keys [ch]}]
      (dom/section
       #js {:className "home"}
-      (om/build editor app {:opts {:ch ch}})
-      (om/build viewer app {:opts {:ch ch}})))))
+      (dom/div
+       #js {:id "left"}
+       (om/build editor app)
+       (om/build options (:test-data app))
+       (om/build preview-button app))
+      (om/build viewer app)))))
 
 (defn tekken
   "The big boss that builds all the components together."
   []
   (om/root
-    (fn [app owner]
-      (dom/div
-        nil
-        (om/build home-ui app)))
-    data
-    {:target (. js/document (getElementById "main"))}))
+   (fn [app owner]
+     (dom/div
+      nil
+      (om/build home-ui app)))
+   data
+   {:target (. js/document (getElementById "main"))}))
 
 (tekken)

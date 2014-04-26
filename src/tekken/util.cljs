@@ -7,25 +7,22 @@
     (js/document.querySelector x)
     x))
 
-(defn html->canvas
-  [node]
-  (let [node ($ node)
-        ch (chan)]
-    (js/html2canvas
-     node
-     #js {:onrendered #(put! ch %)})
-    ch))
+(defn html->canvases
+  []
+  (let [ch (chan)]
+      (js/get_pdf_pages #(put! ch (vec %)))
+      ch))
 
-(defn canvas->pdf
-  [cvs]
-  (let [data-url (. cvs toDataURL "image/jpeg")
-        pdfdoc  (js/jsPDF. "p" "mm" "a4")]
-    (. pdfdoc addImage data-url 0 0 210 297)
+(defn canvases->pdf
+  [canvases]
+  (let [pdfdoc (js/jsPDF. "p" "mm" "a4")
+        lastcvs (last canvases)]
+    (doseq [cvs canvases]
+      (let [data-url (. cvs toDataURL "image/jpeg")]
+        (. pdfdoc addImage data-url 0 0 210 297)
+        (when-not (= cvs lastcvs)
+          (. pdfdoc addPage))))
     (. pdfdoc output "datauristring")))
-
-(defn md->html
-  [s]
-  (. js/Markdown toHTML s))
 
 (defn make-zip
   []
@@ -41,6 +38,10 @@
 ;;    }
 
   )
+
+(defn md->html
+  [s]
+  (. js/Markdown toHTML s))
 
 (defn md->edn
   "...where all the magic happens."
@@ -69,9 +70,14 @@
             all))
 
         parse-question
-        (fn [data]
-          {:test
-           (mapv pre-process-data data)
+        (fn [i data]
+          {:text
+           [(apply
+             vector
+             "header"
+             (let [[tag & more] (first data)]
+               (apply vector tag ["b" ["u" (str " " (inc i) ".")] " "] more))
+             (mapv pre-process-data data))]
 
            :ansers
            (->> data
@@ -87,33 +93,18 @@
          (partition-by #(= "ul" (first %)))
          (partition-all 2)
          (map (partial reduce concat))
-         (map parse-question))))
+         (map-indexed parse-question)
+         (vec))))
 
-(md->edn "
-Напишете някви лайна?
-
-```
-(def a 10)
-```
-
-- a
-- b
-+ `fasfasfsf`
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-```
-
-- a
-- b
-+ c
-- d
-")
-
-
-
-
-
+(defn edn->html
+  [{:keys [questions title]}]
+  (->> (map :text questions)
+       (reduce concat)
+       (cons ["i" "Вариант: А"])
+       (cons ["i" "Група:......"])
+       (cons ["i" "ФН:......"])
+       (cons ["i" "Име:..........................................................................................."])
+       (cons ["h1" title])
+       (cons "html")
+       (clj->js)
+       (.renderJsonML js/Markdown)))

@@ -4,14 +4,15 @@ html, body {
   margin: 10px;
 }
 
+
 #main {
   overflow: hidden;
   position: relative;
 }
 
-#editor {
-  width: 400px;
-  height: 500px;
+#left {
+  width: 500px;
+  height: 800px;
   overflow: hidden;
   display: inline-block;
 
@@ -22,6 +23,8 @@ html, body {
   width: 95%;
   margin: 0 auto;
   padding: 0px;
+  width: 200px;
+  height: 300px;
 }
 
 #viewer {
@@ -32,13 +35,25 @@ html, body {
   background: red;
 }
 
-#viewer section.page {
+#viewer section.page, #viewer section.answers {
   width: 210mm;
   height: 297mm;
   overflow: hidden;
   background: white;
 }
 
+#viewer section.page header {
+
+}
+
+#options input {
+  display: block;
+}
+
 code {
   white-space: pre;
+}
+
+ul {
+    list-style: none;
 }
