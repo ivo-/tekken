@@ -24,7 +24,7 @@
 
 		function chooseSquareClass(digit) {
 			if (digit == 0)
-				return 'square';
+				return 'empty-square';
 			return 'filled-square';
 		}
 
@@ -131,15 +131,16 @@
 		margin-top: 6mm;
 	}
 	.empty-square {
-		height: 4mm;
-		width: 4mm;
+		height: 3.5mm;
+		width: 3.5mm;
 		border: 1mm solid black;
+		margin-top: 6mm;
 	}
 	.filled-square {
-		border: 1mm solid black;
-		background: black;
-		height: 4mm;
-		width:  4mm;
+		border: 2.5mm solid black;
+		background-color: black;
+		height: 0mm;
+		width:  0mm;
 		margin-top: 6mm;
 	}
 	.answerNumber {
