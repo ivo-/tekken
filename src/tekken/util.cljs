@@ -77,7 +77,7 @@
              "header"
              (let [[tag & more] (first data)]
                (apply vector tag ["b" ["u" (str " " (inc i) ".")] " "] more))
-             (mapv pre-process-data data))]
+             (mapv pre-process-data (rest data)))]
 
            :ansers
            (->> data
