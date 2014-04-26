@@ -1,28 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script>
-function getArrayOfPixels (imageUrl) {
-    imageObj = document.getElementById("image");
-    imageObj.crossOrigin = "anonymous";
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <script type="text/javascript" src="blobs.js" ></script>
+    <script>
+        function getArrayOfPixels (imageUrl) {
+            var imageObj = document.getElementById("image");
+            imageObj.crossOrigin = "anonymous";
+            imageObj.src = imageUrl;
 
-    imageObj.onload = function() {
-        canvas = document.getElementById('canvas');
-        canvas.height = imageObj.height;
-        canvas.width = imageObj.width;
-        context = canvas.getContext("2d");
-        context.drawImage(imageObj, 0, 0);
-        imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        pixelArray = imageData.data;
-    };
+            imageObj.onload = function() {
+                var canvas = document.getElementById('canvas');
+                canvas.height = imageObj.height;
+                canvas.width = imageObj.width;
 
-    imageObj.src = imageUrl;
-}
-function getPixelArray () {
-    var imageUrl = document.getElementById("imageUrl").value
-    getArrayOfPixels(imageUrl);
-}
-</script>
+                var context = canvas.getContext("2d");
+                context.drawImage(imageObj, 0, 0);
+
+                var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+                var completePixelArray = imageData.data;
+
+                pixelArrayRGB = [];
+                for (var i = 0; i < completePixelArray.length; i++) {
+                    if (i % 4 != 3) {
+                        pixelArrayRGB.push(completePixelArray[i]);
+                    }
+                }
+            };
+
+        }
+        function getPixelArray () {
+            var imageUrl = document.getElementById("imageUrl").value;
+            getArrayOfPixels(imageUrl);
+        }
+    </script>
 </head>
 
 <body>
