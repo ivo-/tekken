@@ -2,6 +2,7 @@
 ;;
 ;; - proper mm styles
 ;; - generate variants
+;; - question numbers
 ;; - generate answer-sheets
 ;; - generate answer-keys
 ;;
