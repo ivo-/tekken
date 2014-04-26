@@ -35,7 +35,7 @@ html, body {
   background: red;
 }
 
-#viewer section.page {
+#viewer section.page, #viewer section.answers {
   width: 210mm;
   height: 297mm;
   overflow: hidden;
