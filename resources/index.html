@@ -233,7 +233,7 @@
 
         <script type="text/javascript">
             var pagify = function(page) {
-                var page = $("#viewer section.page:last:not(.answers)");
+                var page = $("#viewer section.page:last");
                 var extra = $("<section class='page'></section>");
 
                 while (page[0].clientHeight < page[0].scrollHeight) {
@@ -251,7 +251,7 @@
             requestAnimationFrame(pagify);
 
             var get_pdf_pages = function(callback) {
-                var pages = $("#viewer section.page");
+                var pages = $("#viewer section.page, #viewer section.answers");
                 var counter = 0;
                 var results = [];
 
