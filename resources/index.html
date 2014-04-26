@@ -3,219 +3,39 @@
     <head>
         <meta charset="utf-8">
         <title>Tekken</title>
-        <link rel="stylesheet" type="text/css" href="codemirror.css">
         <link rel="stylesheet" type="text/css" href="theme.css">
     </head>
     <body>
+        <div id="verification"></div>
         <div id="main"></div>
         <script type="text/markdown" id="template">
-Напишете някви лайна?
+Коя година сме?
 
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
+- 1992
+- 2993
++ 2014
+- 681
 
-- a
-- b
-+ c
-- d
+Температура на кипене на водата?
 
-Напишете някви лайна?
++ 100 градуса по целзий
+- 0 градуса по целзий
+- 100 градуса по фаренхайт
+- -43 градуса по фаренхайт
 
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
+Какво се случва с Червената Шапчица в народната приказка за Крали Марко и Ламята Спаска ?
 
-- a
-- b
-+ c
-- d
+- само хубави работи
++ Вълкът изяжда Крали Марко
+-Ламята Спаска побеждава Вълкът и Червената Шапчица на канадска борба, а след това и на криеница
+- Вълкът е братовчед на вълка от 'Ну Погоди!' и пощадява живота на бабата на Червената Шапчица, след като изяжда 3 килограма от прясноприготвения й ябълкоборинков оцет.
 
-Напишете някви лайна?
+Какво значи Гаусово разпределение ?
 
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
-
-Напишете някви лайна?
-
-```
-(def a 10)
-(for [x 10]
-  (inc x))
-```
-
-- a
-- b
-+ c
-- d
++ 2 + 2 = 4
+- x^2 + 8 = 12
+- Не съществува подобно понятие
+- НЕ ЗНАМ.
         </script>
 
         <script src="jquery-2.1.0.js"></script>
@@ -225,11 +45,6 @@
         <script src="jszip.min.js"></script>
         <script src="markdown.js"></script>
         <script src="react-0.8.0.js"></script>
-
-        <script src="codemirror.js"></script>
-        <script src="continuelist.js"></script>
-        <script src="markdown-mode.js"></script>
-
 
         <script src="../target/dev/goog/base.js" type="text/javascript"></script>
         <script src="../target/main-debug.js" type="text/javascript"></script>
@@ -243,7 +58,7 @@
                 var extra = $("<section class='page'></section>");
 
                 while (page[0].clientHeight < page[0].scrollHeight) {
-                    extra.append(page.find("header:last").remove());
+                    extra.prepend(page.find("header:last").remove());
                 }
 
                 if (extra.children().length) {
@@ -257,7 +72,7 @@
             requestAnimationFrame(pagify);
 
             var get_pdf_pages = function(callback) {
-                var pages = $("#viewer section.page");
+                var pages = $("#viewer section.page, #viewer section.answers");
                 var counter = 0;
                 var results = [];
 
@@ -270,13 +85,6 @@
                     }});
                 });
             };
-
-            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-                mode: 'markdown',
-                lineNumbers: true,
-                theme: "default",
-                extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
-            });
         </script>
     </body>
 </html>

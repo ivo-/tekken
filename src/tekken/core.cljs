@@ -1,21 +1,23 @@
 ;; TODO:
 ;;
 ;; - proper mm styles
-;; - generate printable html file (print view)
-;; - options component
 ;; - generate variants
 ;; - generate answer-sheets
 ;; - generate answer-keys
 ;;
-;; - image recognition
-;;
 ;; - generate checkui
 ;; - generate statistics
+;;
+;; Someday:
+;;
+;; - image recognition
+;; - generate printable html file (print view)
 ;;
 
 (ns tekken.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require  [tekken.util :as util]
+             [tekken.verification :as verification]
              [om.core :as om :include-macros true]
              [om.dom :as dom :include-macros true]
              [cljs.core.async :as async :refer [put! <! >! chan map>]]))
@@ -161,6 +163,30 @@
       (dom/div #js {:ref "preview"
                     :className "preview"})))))
 
+(defn answers-key
+  "For teachers."
+  [app owner]
+  (reify
+    om/IRender
+    (render
+     [_]
+     (dom/section
+      #js {:id "answers-key"
+           :className "answers"}
+      "Anwers key"))))
+
+(defn answers-sheet
+  "For students."
+  [app owner]
+  (reify
+    om/IRender
+    (render
+     [_]
+     (dom/section
+      #js {:id "answers-sheet"
+           :className "answers"}
+      "Anwers sheet"))))
+
 (defn viewer
   "Test viewer component."
   [{:keys [test-data]} owner]
@@ -174,7 +200,9 @@
        (clj->js {:ref "page"
                  :className "page"
                  :dangerouslySetInnerHTML
-                 {:__html (util/edn->html test-data)}}))))))
+                 {:__html (util/edn->html test-data)}}))
+      (om/build answers-key test-data)
+      (om/build answers-sheet test-data)))))
 
 (defn home-ui
   "Home page ui."
@@ -187,6 +215,7 @@
       #js {:className "home"}
       (dom/div
        #js {:id "left"}
+       (prn-str app)
        (om/build editor app)
        (om/build options (:test-data app))
        (om/build preview-button app))

@@ -70,9 +70,14 @@
             all))
 
         parse-question
-        (fn [data]
+        (fn [i data]
           {:text
-           [(apply vector "header" (mapv pre-process-data data))]
+           [(apply
+             vector
+             "header"
+             (let [[tag & more] (first data)]
+               (apply vector tag ["b" ["u" (str " " (inc i) ".")] " "] more))
+             (mapv pre-process-data (rest data)))]
 
            :ansers
            (->> data
@@ -88,7 +93,8 @@
          (partition-by #(= "ul" (first %)))
          (partition-all 2)
          (map (partial reduce concat))
-         (mapv parse-question))))
+         (map-indexed parse-question)
+         (vec))))
 
 (defn edn->html
   [{:keys [questions title]}]
