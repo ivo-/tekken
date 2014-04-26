@@ -1,16 +1,17 @@
 ;; TODO:
 ;;
 ;; - proper mm styles
-;; - generate printable html file (print view)
-;; - options component
 ;; - generate variants
 ;; - generate answer-sheets
 ;; - generate answer-keys
 ;;
-;; - image recognition
-;;
 ;; - generate checkui
 ;; - generate statistics
+;;
+;; Someday:
+;;
+;; - image recognition
+;; - generate printable html file (print view)
 ;;
 
 (ns tekken.core
