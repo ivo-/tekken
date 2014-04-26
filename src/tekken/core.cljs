@@ -137,7 +137,7 @@
 
       :onMouseEnter
       (fn [_]
-        (let [ch (util/html->canvases)]
+        #_(let [ch (util/html->canvases)]
           (go
            (let [canvases (<! ch)
                  node (om/get-node owner "preview")]
@@ -146,7 +146,7 @@
 
       :onMouseLeave
       (fn [_]
-        (-> (om/get-node owner "preview")
+        #_(-> (om/get-node owner "preview")
             (aset "innerHTML" "")))})
 
     om/IRenderState
@@ -157,7 +157,7 @@
       (dom/a #js {:href "javascript:void(0);"
                   :onClick onClick
                   :onMouseEnter onMouseEnter
-                  :onMouseLeave onMouseLeave} "Preview/Download")
+                  :onMouseLeave onMouseLeave} "Download")
       (dom/div #js {:ref "preview"
                     :className "preview"})))))
 
