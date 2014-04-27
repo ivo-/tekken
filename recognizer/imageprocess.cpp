@@ -1,6 +1,7 @@
 #include "types.h"
 #include "utils.h"
 #include "vimage.h"
+#include "sat.h"
 
 vector<vector<Pt> > offsets;
 
@@ -75,17 +76,23 @@ static bool isMarker(const VImage& image, int x, int y, int rindx)
 
 vector<Pt> findMarkers(VImage& image)
 {
-	const int radii[] = { 10, 13, 16, 20 };
+	const int radii[] = { 8, 12, 15, 16, 18, 20 };
 	const int NR = COUNT_OF(radii);
 	const int maxRadius = radii[NR - 1];
 	genOffsets(radii, NR);
 	int w = image.w;
 	int h = image.h;
 	
+	SAT sat(w, h);
+	FOR(y, h) FOR(x, w) sat.setPixel(x, y, !!image.getpixel(x, y).r);
+	sat.prepareSAT();
+	
+	printf("."); fflush(stdout);
 	typedef pair<Pt, int> Cand;
-	vector<Cand> cands;
+	vector<Cand> cands; 
 	for (int y = maxRadius + 1; y < h - maxRadius - 1; y++)
 		for (int x = maxRadius + 1; x < w - maxRadius - 1; x++) {
+			if (sat.pureColorAround(x, y, 5)) continue;
 //			if (x == 1083 && y == 600)
 			if (isMarker(image, x, y, 0)) {
 				int sz = 1;
@@ -93,11 +100,13 @@ vector<Pt> findMarkers(VImage& image)
 					if (!isMarker(image, x, y, sz)) break;
 					sz++;
 				}
-				if (sz >= 3)
+				if (sz >= NR)
 					cands.push_back(make_pair(Pt(x, y), sz));
 			}
 		}
+	printf("."); fflush(stdout);
 	stable_sort(cands.begin(), cands.end(), [](const Cand& left, const Cand& right) { return left.second > right.second; });
+	printf("."); fflush(stdout);
 	//
 //	printf("Markers: \n");
 //	REP(i, cands) printf("score %d, (%d, %d)\n", cands[i].second, (int) cands[i].first.x, (int) cands[i].first.y);
@@ -108,7 +117,7 @@ vector<Pt> findMarkers(VImage& image)
 	REP(i, cands) {
 		Pt t = cands[i].first;
 		int foundIdx = -1;
-		REP(j, clusters) if (dist(t, clusters[j][0]) < CLUSTER_RANGE) {
+		for (int j = (int) clusters.size() - 1; j >= 0; j--) if (dist(t, clusters[j][0]) < CLUSTER_RANGE) {
 			foundIdx = j;
 			break;
 		}
@@ -126,6 +135,7 @@ vector<Pt> findMarkers(VImage& image)
 		else
 			clusters.push_back(vector<Pt>(1, t));
 	}
+	printf("."); fflush(stdout);
 	vector<Pt> results;
 	REP(i, clusters) {
 		Pt average(0, 0);
@@ -133,5 +143,6 @@ vector<Pt> findMarkers(VImage& image)
 		average /= double(clusters[i].size());
 		results.push_back(average);
 	}
+	printf("."); fflush(stdout);
 	return results;
 }
