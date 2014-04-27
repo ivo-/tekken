@@ -2,14 +2,10 @@
 ;;
 ;; - statistics
 ;; - persist state
-;; - pages remain
 ;; - delete old answers
 ;; - generate variants
 ;; - generate answer-sheets
 ;; - generate answer-keys
-;;
-;; - generate checkui
-;; - generate statistics
 ;;
 ;; Someday:
 ;;
@@ -279,7 +275,6 @@
      [_ {:keys [ch]}]
      (dom/section
       #js {:className "home"}
-      (pr-str app)
       (dom/div
        #js {:id "left"}
        (om/build editor app)

@@ -30,4 +30,5 @@
    Key е масив от правилните отговори за всички варианти.
    Data са всички попълнени тестове, които искаме да проверим"
     (atom {:key  [variant-solutions]
-           :data [user-solution-data]})))
+           :data [user-solution-data]
+           :variants [v1 v2]})))

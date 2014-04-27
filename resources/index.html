@@ -169,6 +169,11 @@
 
         <script type="text/javascript">
             var pagify = function(page) {
+                var f = $("#viewer section.page:first");
+                if (f[0].clientHeight < f[0].scrollHeight) {
+                    $("#viewer section.page:gt(0)").remove();
+                }
+
                 var page = $("#viewer section.page:last");
                 var extra = $("<section class='page'></section>");
 
