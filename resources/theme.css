@@ -36,10 +36,11 @@ html, body {
 }
 
 #viewer section.page, #viewer section.answers {
-  width: 210mm;
-  height: 297mm;
+  width: 190mm;
+  height: 277mm;
   overflow: hidden;
   background: white;
+  padding: 10mm;
 }
 
 #viewer section.page header {
@@ -56,4 +57,27 @@ code {
 
 ul {
     list-style: none;
+}
+
+
+.row .column {
+    display: inline-block;
+    width: 6.5%;
+}
+
+.row .column div {
+    width: 5mm;
+    height: 5mm;
+    border: 4px solid black;
+    margin: 10px;
+}
+
+.row .column div.number {
+    border: none;
+    text-align: center;
+    margin: 14px;
+}
+
+.row .column div.filled {
+    background: black;
 }
