@@ -1,7 +1,7 @@
 ;; STATISTICS:
 ;;
-;; - couple verification with app state
 ;; - allow dirct data paste
+;; - print key
 ;;
 ;; TODO:
 ;;
