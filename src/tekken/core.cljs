@@ -34,14 +34,16 @@
   (.-innerText (util/$ "#template")))
 
 (def data
-  (atom (or (util/store "app")
-            {:render-data nil
+  (atom (if-let [d (util/store "app")]
+          (assoc d :solutions [(verification/new-solution d)])
+          {:render-data nil
 
-             :test-data {:title "Clojure II"
-                         :questions {}
-                         :variants 5
-                         :per-variant 15}
-             :variants []})))
+           :test-data {:title "Clojure II"
+                       :questions {}
+                       :variants 5
+                       :per-variant 15}
+           :variants []
+           :solutions []})))
 
 (defn test-data->variants
   [{:keys [questions per-variant variants] :as state}]
@@ -94,7 +96,7 @@
       :onVariantChange
       (fn [e]
         (let [v (.val (js/$ (.. e -target)))]
-          (if (= v "whole")
+          (if (= v "–")
             (om/update! app :render-data false)
             (om/update! app :render-data (variant->data @app v)))))})
 
@@ -111,29 +113,29 @@
             :value (:title test-data)
             :onChange onTitle})
 
-      (dom/label nil "Number of variants: ")
+      (dom/label nil "Брой варианти: ")
       (dom/input
        #js {:type "text"
             :value variants
             :onBlur (partial onBlur :variants)
             :onChange (partial onChange :variants)})
 
-      (dom/label nil "Questions per variant: ")
+      (dom/label nil "Въпроси по вариант: ")
       (dom/input
        #js {:type "text"
             :value per-variant
             :onBlur (partial onBlur :per-variant)
             :onChange (partial onChange :per-variant)})
 
-      (dom/label nil "Show variant: ")
+      (dom/label nil "Покажи вариант: ")
       (apply dom/select
              #js {:onChange onVariantChange
                   :value (:variant (or (:render-data app)
-                                       {:variant "whole"}))}
+                                       {:variant "–"}))}
              (map #(dom/option #js {:value %} %)
                   (->> (:variants test-data)
                        (range 0)
-                       (cons "whole"))))))))
+                       (cons "–"))))))))
 
 (defn editor
   [{:keys [test-data] :as app} owner]
@@ -291,6 +293,7 @@
      [_ {:keys [ch]}]
      (dom/section
       #js {:className "home"}
+      (om/build verification/verification app)
       (dom/div
        #js {:id "left"}
        (om/build editor app)
@@ -308,5 +311,8 @@
       (om/build home-ui app)))
    data
    {:target (. js/document (getElementById "main"))}))
+
+;; ==================================================================
+;; Render
 
 (tekken)

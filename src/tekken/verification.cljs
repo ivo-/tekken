@@ -5,35 +5,11 @@
             [cljs.core.async :as async :refer [put! <! >! chan map>]]))
 
 ;; ==================================================================
-;; State
-
-(def app-state
-  (atom
-   {:test-data {:questions [{:text "Q1"
-                             :answers [true false false false]}
-                            {:text "Q2"
-                             :answers [false true false false]}
-                            {:text "Q3"
-                             :answers [false false true false]}
-                            {:text "Q4"
-                             :answers [false false false true]}]
-                :per-variant 4
-                :variants 5
-                :title "Тест по clojure"}
-    :variants [[1 2 3 4]
-               [2 3 4 1]]
-    :solutions []}))
-
-;; ==================================================================
 ;; Generators
 
 (defn new-answer
   []
   {:value ""})
-
-(defn gen-name
-  []
-  (apply str (take 5 (repeatedly #(rand-int 2)))))
 
 (defn gen-answers
   [n]
@@ -41,11 +17,9 @@
 
 (defn new-solution
   [{:keys [test-data]}]
-  {:id (gen-name)
+  {:id ""
    :variant 1
    :answers (gen-answers (:per-variant test-data))})
-
-(swap! app-state update-in [:solutions] conj (new-solution @app-state))
 
 ;; ==================================================================
 ;; Complements
@@ -133,28 +107,30 @@
       nil
       (dom/div
        nil
-       (dom/i nil "Student:")
+       (dom/i nil "Студент: ")
        (dom/input #js {:type "text"
                        :value id
                        :onChange onIdChange}))
 
+      (dom/i nil "Вариант: ")
       (apply dom/select
              #js {:onChange onVariantChange
                   :value variant}
              (map #(dom/option #js {:value %} %)
                   (range 1 (inc variants-count))))
 
+      (dom/div nil "Отговори: ")
       (apply dom/div nil
              (om/build-all answer-input
                            answers))
 
       (dom/button
        #js {:onClick onSolutionComplete}
-       "Next")
+       "Следващ")
 
       (dom/button
        #js {:onClick onVerificationComplete}
-       "End")))))
+       "Край")))))
 
 (defn verification
   [{:keys [solutions
@@ -163,38 +139,59 @@
     om/IInitState
     (init-state
       [_]
-     {:ch (chan)})
+     {:ch (chan)
+      :show false})
 
     om/IWillMount
     (will-mount
      [_]
-      (let [{:keys [ch]} (om/get-state owner)]
-        (go-loop
-         []
-         (case (<! ch)
-           :next
-           (om/transact! solutions #(conj % (new-solution @app)))
 
-           :end
-           (js/alert "fasfdsfd"))
-         (recur))))
+     (let [{:keys [ch]} (om/get-state owner)]
+       (go-loop
+        []
+        (case (<! ch)
+          :next
+          (om/transact! solutions #(conj % (new-solution @app)))
+
+          :end
+          (do
+            (om/set-state! owner :show false)
+            (->> @solutions
+                 (butlast)
+                 (mapv (fn [student]
+                         (-> student
+                             (update-in [:answers]
+                                        (partial mapv :value)))))
+                 (pr-str)
+                 (.log js/console))))
+        (recur))))
 
     om/IRenderState
     (render-state
-     [_ {:keys [ch]}]
+     [_ {:keys [ch show]}]
      (dom/div
       #js {:id "verification"}
-      (om/build solution-form
-                (last solutions)
-                {:opts {:ch ch
 
-                        :variants-count
-                        (:variants test-data)
+      (if show
+        (dom/div
+         nil
+         (dom/span nil "Проверени студенти: ")
+         (dom/b nil (count solutions))
+         (om/build solution-form
+                   (last solutions)
+                   {:opts {:ch ch
 
-                        :questions-count
-                        (:per-variant test-data)}})))))
+                           :variants-count
+                           (:variants test-data)
 
-(om/root
- verification
- app-state
- {:target (.getElementById js/document "verification")})
+                           :questions-count
+                           (:per-variant test-data)}}))
+        (dom/a
+         #js {:href "javascript:void(0);"
+              :onClick #(do (om/set-state! owner :show true)
+                          (om/update! solutions [(new-solution @app)]))}
+         "Започни въвеждане на решения"))))))
+
+
+
+
