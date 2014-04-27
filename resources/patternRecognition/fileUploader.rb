@@ -10,6 +10,7 @@ post "/upload" do
     # exec("./recognizer #{params['testfile'][:filename]} count_test 4 5 ./result.txt")
     exec("cat #{params['testfile'][:filename]}")
   end
+  Process.wait()
   return "The test was successfully checked!"
 end
 
