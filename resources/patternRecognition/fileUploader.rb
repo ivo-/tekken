@@ -18,16 +18,20 @@ end
 class ResultParser
   def self.perform
     answer_list = {}
-    File.open('./results.txt') do |results|
-      answer_list[:counts] = results.gets.chop
-      answer_list[:fn] = results.gets.chop
-      while line = results.gets
-        question = line.match(/.*-/).to_s.chop
-        answer = line.match(/-./).to_s[1]
-        answer_list[question] = answer
+    if File.exists?('./results.txt')
+      File.open('./results.txt') do |results|
+        answer_list[:counts] = results.gets.chop
+        answer_list[:fn] = results.gets.chop
+        while line = results.gets
+          question = line.match(/.*-/).to_s.chop
+          answer = line.match(/-./).to_s[1]
+          answer_list[question] = answer
+        end
+
+        JSON.generate(answer_list)
       end
+    else
+      "too bad photo"
     end
-    JSON.generate(answer_list)
   end
 end
-
