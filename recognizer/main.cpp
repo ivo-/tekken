@@ -51,6 +51,7 @@ bool parseCmdLine(int argc, char** argv)
 		return false;
 	}
 	fclose(test);
+	unlink(argv[5]);
 	outFile = argv[5];
 	//
 	return true;
@@ -63,7 +64,7 @@ static bool straightlined(const Pt& a, const Pt& b, const Pt& c)
 	double d3 = dist(b, c);
 	double sum = d2 + d3;
 	if (d1 < sum * 0.95 || d1 > sum * 1.05) return false;
-	if (min(d2, d3) < 0.8 * max(d2, d3)) return false;
+//	if (min(d2, d3) < 0.8 * max(d2, d3)) return false;
 	double angle = getAngle(a, b, c);
 	return angle > 175;
 }
@@ -108,12 +109,29 @@ void filterMarkers(vector<Pt>& markers)
 }
 
 
+void outData(const TestData& td)
+{
+	FILE* f = fopen(outFile.c_str(), "wt");
+	fprintf(f, "%d\n", td.variant);
+	for (int i = 0; i < numFn; i++) {
+		if (td.fn[i] == -1) fprintf(f, "?");
+		else fprintf(f, "%d", td.fn[i]);
+	}
+	fprintf(f, "\n");
+	for (int i = 0; i < numQ; i++) {
+		fprintf(f, "%d-", i + 1);
+		if (td.answers[i] == -1) fprintf(f, "?");
+			else fprintf(f, "%c", 'a' + td.answers[i]);
+		fprintf(f, "\n");
+	}
+	fclose(f);
+}
 
 int main(int argc, char** argv)
 {
 	if (!parseCmdLine(argc, argv)) return 1;
 	wxInitAllImageHandlers();
-	printf("Read\n");
+	printf("%s: read\n", argv[1]);
 	wxImage img(WXSTRING(inputFile));
 	if (!img.Ok()) {
 		printf("Cannot open image!\n");
@@ -122,15 +140,21 @@ int main(int argc, char** argv)
 	VImage image(img);
 	while (image.w * image.h > 10000000)
 		image.resizeHalf();
+	double mpix = image.w * image.h / 1000000.0;
+	if (mpix < 3.3)
+		image.enlarge(sqrt(6.0/mpix));
 	printf("grayscale\n");
 	image.to_grayscale();
+	image.gaussian_blur(3);
+	VImage colorful = image;
 	printf("falloff\n");
 	image.fix_falloff();
 	printf("Otsu\n");
 	int thresh = image.getOtsuThreshold();
 	
-	VImage colorful = image;
 	image.binarize(thresh);
+	
+//	image.save("/home/vesko/binarized.png");
 	
 	printf("Markers..."); fflush(stdout);
 	vector<Pt> markers = findMarkers(image);
@@ -146,8 +170,16 @@ int main(int argc, char** argv)
 	REP(i, markers)
 		FOR(dy, 3) FOR(dx, 3)
 			image.putpixel(dx - 1 + markers[i].x, dy - 1 + markers[i].y, RGBA(0, 0xff, 0));
+
+//	image.save("/home/vesko/marked.png");
+
 	REP(i, markers) printf("(%d, %d) ", (int) markers[i].x, (int) markers[i].y);
 	printf("\n");
+	
+	if (markers.size() < 5) {
+		printf("Error: markers not found!\n");
+		return 2;
+	}
 	
 	printf("Transform\n");
 	Pt corners[4] = { markers[0], markers[2], markers[3], markers[4] };
@@ -163,11 +195,18 @@ int main(int argc, char** argv)
 	
 	if (image.sample(6, 6, 3) == 0) {
 		perspectived->flipX();
-		image.flipX();
 	}
 	
-	printf("Save\n");
-	perspectived->save(outFile);
+	perspectived->fix_falloff();
+
+	image = *perspectived;
+	//image.binarize(image.getOtsuThreshold());
 	
+//	printf("Save\n");
+//	image.save(outFile);
+	
+	TestData data = recognize(image);
+	//
+	outData(data);
 	return 0;
 }

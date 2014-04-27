@@ -1,14 +1,16 @@
+;; STATISTICS:
+;;
+;; - couple verification with app state
+;; - allow dirct data paste
+;;
 ;; TODO:
 ;;
-;; - statistics
-;; - pages remain
 ;; - delete old answers
-;; - generate variants
-;; - generate answer-sheets
-;; - generate answer-keys
 ;;
-;; - generate checkui
-;; - generate statistics
+;; Design:
+;;
+;; - answer-sheets
+;; - answer-keys
 ;;
 ;; Someday:
 ;;
@@ -32,11 +34,14 @@
   (.-innerText (util/$ "#template")))
 
 (def data
-  (atom {:test-data {:title "Clojure II"
-                     :questions {}
-                     :variants 5
-                     :per-variant 15}}
-        :variants []))
+  (atom (or (util/store "app")
+            {:render-data nil
+
+             :test-data {:title "Clojure II"
+                         :questions {}
+                         :variants 5
+                         :per-variant 15}
+             :variants []})))
 
 (defn test-data->variants
   [{:keys [questions per-variant variants] :as state}]
@@ -62,17 +67,17 @@
 
 (defn options
   "Options component."
-  [app owner]
+  [{:keys [test-data] :as app} owner]
   (reify
     om/IInitState
     (init-state
      [_]
-     {:variants (:variants app)
-      :per-variant (:per-variant app)
+     {:variants (:variants test-data)
+      :per-variant (:per-variant test-data)
 
       :onTitle
       (fn [e]
-        (om/update! app :title (.. e -target -value)))
+        (om/update! test-data :title (.. e -target -value)))
 
       :onChange
       (fn [k e]
@@ -81,14 +86,21 @@
             (om/set-state! owner k "")
             (do
               (om/set-state! owner k value)
-              (om/update! app k value)))))
+              (om/update! test-data k value)))))
       :onBlur
       (fn [k e]
-        (om/set-state! owner k (k @app)))})
+        (om/set-state! owner k (k @test-data)))
+
+      :onVariantChange
+      (fn [e]
+        (let [v (.val (js/$ (.. e -target)))]
+          (if (= v "whole")
+            (om/update! app :render-data false)
+            (om/update! app :render-data (variant->data @app v)))))})
 
     om/IRenderState
     (render-state
-     [_ {:keys [per-variant variants onChange onBlur onTitle]}]
+     [_ {:keys [per-variant variants onChange onBlur onTitle onVariantChange]}]
      (dom/form
       #js {:id "options"
            :action "javascript: void(0);"}
@@ -96,7 +108,7 @@
       (dom/label nil "Title: ")
       (dom/input
        #js {:type "text"
-            :value (:title app)
+            :value (:title test-data)
             :onChange onTitle})
 
       (dom/label nil "Number of variants: ")
@@ -111,7 +123,17 @@
        #js {:type "text"
             :value per-variant
             :onBlur (partial onBlur :per-variant)
-            :onChange (partial onChange :per-variant)})))))
+            :onChange (partial onChange :per-variant)})
+
+      (dom/label nil "Show variant: ")
+      (apply dom/select
+             #js {:onChange onVariantChange
+                  :value (:variant (or (:render-data app)
+                                       {:variant "whole"}))}
+             (map #(dom/option #js {:value %} %)
+                  (->> (:variants test-data)
+                       (range 0)
+                       (cons "whole"))))))))
 
 (defn editor
   [{:keys [test-data] :as app} owner]
@@ -154,13 +176,18 @@
 
 (defn preview-button
   "Preview button component."
-  [{:keys [test-data]} owner]
+  [{:keys [test-data] :as app} owner]
   (reify
     om/IInitState
     (init-state
      [_]
      {:onClick
       (fn [_]
+        ;;         (om/update! app :render-data (variant->data @app 1))
+        ;;         (.log js/console "Render 1....................")
+        ;;         (js/setTimeout
+        ;;          #(do 1)
+        ;;          1000)
         (let [ch (util/html->canvases)]
           (go
            (let [canvases (<! ch)]
@@ -169,16 +196,16 @@
       :onMouseEnter
       (fn [_]
         #_(let [ch (util/html->canvases)]
-          (go
-           (let [canvases (<! ch)
-                 node (om/get-node owner "preview")]
-             (aset node "innerHTML" "")
-             (doall (map #(.appendChild node %) canvases))))))
+            (go
+             (let [canvases (<! ch)
+                   node (om/get-node owner "preview")]
+               (aset node "innerHTML" "")
+               (doall (map #(.appendChild node %) canvases))))))
 
       :onMouseLeave
       (fn [_]
         #_(-> (om/get-node owner "preview")
-            (aset "innerHTML" "")))})
+              (aset "innerHTML" "")))})
 
     om/IRenderState
     (render-state
@@ -192,9 +219,6 @@
       (dom/div #js {:ref "preview"
                     :className "preview"})))))
 
-
-
-
 (defn answers-key
   "For teachers."
   [{:keys [questions]} owner]
@@ -207,14 +231,14 @@
            :className "answers"}
       (apply dom/div #js {:className "row"}
              (map-indexed
-               (fn [index {:keys [answers]}]
-                 (apply dom/div #js {:className "column"}
-                        (conj
-                          (map (fn [value]
-                                 (dom/div #js {:className (if value "filled")}))
-                               answers)
-                          (dom/div #js {:className "number"} (inc index)))))
-               questions))))))
+              (fn [index {:keys [answers]}]
+                (apply dom/div #js {:className "column"}
+                       (conj
+                        (map (fn [value]
+                               (dom/div #js {:className (if value "filled")}))
+                             answers)
+                        (dom/div #js {:className "number"} (inc index)))))
+              questions))))))
 
 (defn answers-sheet
   "For students."
@@ -228,29 +252,35 @@
            :className "answers"}
       (apply dom/div #js {:className "row"}
              (map-indexed
-               (fn [index {:keys [answers]}]
-                 (apply dom/div #js {:className "column"}
-                        (conj
-                          (map (fn [_] (dom/div nil "")) answers)
-                          (dom/div #js {:className "number"} (inc index)))))
-               questions))))))
+              (fn [index {:keys [answers]}]
+                (apply dom/div #js {:className "column"}
+                       (conj
+                        (map (fn [_] (dom/div nil "")) answers)
+                        (dom/div #js {:className "number"} (inc index)))))
+              questions))))))
 
 (defn viewer
   "Test viewer component."
-  [{:keys [test-data] :as app} owner]
+  [{:keys [test-data render-data] :as app} owner]
   (reify
+    om/IDidUpdate
+    (did-update
+     [_ _ _]
+     (util/store "app" app))
+
     om/IRender
     (render
      [_]
-     (dom/div
-      #js {:id "viewer"}
-      (dom/section
-       (clj->js {:ref "page"
-                 :className "page"
-                 :dangerouslySetInnerHTML
-                 {:__html (util/edn->html test-data)}}))
-        (om/build answers-key test-data)
-        (om/build answers-sheet test-data)))))
+     (let [data (or render-data test-data)]
+       (dom/div
+        #js {:id "viewer"}
+        (dom/section
+         (clj->js {:ref "page"
+                   :className "page"
+                   :dangerouslySetInnerHTML
+                   {:__html (util/edn->html data)}}))
+        (om/build answers-key data)
+        (om/build answers-sheet data))))))
 
 (defn home-ui
   "Home page ui."
@@ -264,7 +294,7 @@
       (dom/div
        #js {:id "left"}
        (om/build editor app)
-       (om/build options (:test-data app))
+       (om/build options app)
        (om/build preview-button app))
       (om/build viewer app)))))
 

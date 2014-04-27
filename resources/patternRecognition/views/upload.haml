@@ -1,9 +1,9 @@
 %html
   %body
     %form{method: "post", enctype:'multipart/form-data'}
-      %h1 How many answer are on the test
+      %h1 How many answers are on the test
       %input{type: 'text', style: "width: 20px", name: 'count_test'}
       %h1 Upload Test Photo
-      %input{type: 'file', name: 'myfile'}
+      %input{type: 'file', name: 'testfile', multiple: true}
       %br
       %input{type: 'submit', value:'Upload!'}

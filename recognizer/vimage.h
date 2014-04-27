@@ -28,17 +28,23 @@ class VImage {
 		if (y >= h) y = h - 1;
 		return y;
 	}
+	void construct_empty(int x, int y)
+	{
+		w = x;
+		h = y;
+		gain = 1.0f;
+		data = new RGBA[w*h];
+		memset(data, 0, w * h * sizeof(RGBA));
+	}
 	float gain;
 public:
 	int w, h;
 	RGBA* data;
 
 	VImage(const wxImage& img);
-	VImage(int w, int h): w(w), h(h)
+	VImage(int w, int h)
 	{
-		gain = 1.0f;
-		data = new RGBA[w*h];
-		memset(data, 0, w * h * sizeof(RGBA));
+		construct_empty(w, h);
 	}
 	VImage(const VImage& rhs)
 	{
@@ -86,12 +92,14 @@ public:
 	void white_balance(int x1, int y1, int x2, int y2); // apply white balance, sampling from the selected rectangle
 	int num_different_colors(void) const; // total number of differnt colors, up to 2^24
 	void fix_falloff(void);
+	void enlarge(float factor);
 	void resizeHalf(void);
 	
 	int sample(int x, int y, int size); // check if the square with length `size', centered at `x', `y' is mostly white or black
 	void flipX(); // flip image by X
 	
 	void save(const string& fn);
+	void mark(int x, int y);
 };
 
 #endif // __VIMAGE_H__
