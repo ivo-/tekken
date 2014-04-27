@@ -165,16 +165,15 @@
         <script src="../target/dev/goog/base.js" type="text/javascript"></script>
         <script src="../target/main-debug.js" type="text/javascript"></script>
         <script type="text/javascript">
-         goog.require('tekken.core');
+        goog.require('tekken.core');
         </script>
 
-        <script type="text/javascript">
+        <script>
             var pagify = function(page) {
                 var f = $("#viewer section.page:first");
                 if (f[0].clientHeight < f[0].scrollHeight) {
                     $("#viewer section.page:gt(0)").remove();
                 }
-
                 var page = $("#viewer section.page:last");
                 var extra = $("<section class='page'></section>");
 
@@ -185,12 +184,9 @@
                 if (extra.children().length) {
                     extra.insertAfter(page);
                 }
-
-                requestAnimationFrame(pagify);
             };
 
-            // ...good enough for the demo and not breaking om's internal render loop
-            requestAnimationFrame(pagify);
+            setInterval(pagify, 500);
 
             var get_pdf_pages = function(callback) {
                 var pages = $("#viewer section.page, #viewer section.answers");
