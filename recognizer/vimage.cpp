@@ -142,6 +142,18 @@ void VImage::resizeHalf(void)
 	h = nh;
 }
 
+void VImage::enlarge(float factor)
+{
+	int nw = w * factor;
+	int nh = h * factor;
+	RGBA * ndata = new RGBA[nw * nh];
+	FOR(y, nh) FOR(x, nw) ndata[y * nw + x] = data[min(h - 1, int(y/factor)) * w + min(w - 1, int(x/factor))];
+	delete[] data;
+	data = ndata;
+	w = nw;
+	h = nh;
+}
+
 int VImage::sample(int x, int y, int size)
 {
 	if (size % 2 == 0) size++;
@@ -161,4 +173,61 @@ void VImage::flipX()
 			j--;
 		}
 	}
+}
+
+void VImage::gaussian_blur(int R)
+{
+	vector<float> C(2*R + 1);
+	//
+	float sum = 0;
+	for (int x = -R; x <= R; x++)
+		sum += C[x + R] = exp(-(x*x) / (2 * R * R)) / (2 * M_PI * R * R);
+	float mult = 1.0 / sum;
+	FOR(i, 2*R + 1)
+		C[i] *= mult;
+	// using fixed-point arithmetic for speed
+	vector<int> IC(2 * R + 1);
+	REP(i, C) IC[i] = (int) floor(0.5f + C[i] * 65536);
+	//
+	VImage temp = *this;
+	RGBA* src = data, *dest = temp.data;
+	// Separable gaussian blur - X direction
+	FOR(y, h) FOR(x, w) {
+		int r = 32768, g = 32768, b = 32768;
+		for (int dx = -R; dx <= R; dx++) {
+			if (x + dx < 0 || x + dx >= w) continue;
+			const RGBA& pixel = src[y * w + (x + dx)];
+			int coeff = IC[dx + R];
+			r += pixel.r * coeff;
+			g += pixel.g * coeff;
+			b += pixel.b * coeff;
+		}
+		dest[y * w + x].r = r >> 16;
+		dest[y * w + x].g = g >> 16;
+		dest[y * w + x].b = b >> 16;
+	}
+	src = temp.data;
+	dest = data;
+	// Separable gaussian blur - Y direction
+	FOR(y, h) FOR(x, w) {
+		int r = 32768, g = 32768, b = 32768;
+		for (int dy = -R; dy <= R; dy++) {
+			if (y + dy < 0 || y + dy >= h) continue;
+			const RGBA& pixel = src[(y + dy) * w + x];
+			int coeff = IC[dy + R];
+			r += pixel.r * coeff;
+			g += pixel.g * coeff;
+			b += pixel.b * coeff;
+		}
+		dest[y * w + x].r = r >> 16;
+		dest[y * w + x].g = g >> 16;
+		dest[y * w + x].b = b >> 16;
+	}
+}
+
+void VImage::mark(int x, int y)
+{
+	RGBA& p = data[y * w + x];
+	p.r = min(255, int(p.r) + 32);
+	p.g = min(255, int(p.g) + 32);
 }

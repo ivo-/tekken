@@ -24,7 +24,7 @@ void SAT::prepareSAT()
 
 
 // sum of pixel values within [x1..x2] x [y1 .. y2]
-int SAT::query(int x1, int y1, int x2, int y2)
+int SAT::query(int x1, int y1, int x2, int y2) const
 {
 	x1 += 1;
 	y1 += 1;
@@ -33,7 +33,7 @@ int SAT::query(int x1, int y1, int x2, int y2)
 	return get(x2, y2) - get(x1 - 1, y2) - get(x2, y1 - 1) + get(x1 - 1, y1 - 1);
 }
 
-bool SAT::pureColorAround(int x, int y, int radius)
+bool SAT::pureColorAround(int x, int y, int radius) const
 {
 	int x1 = max(0, x - radius);
 	int x2 = min(w - 1, x + radius);
@@ -44,3 +44,12 @@ bool SAT::pureColorAround(int x, int y, int radius)
 	return q == area || q == 0;
 }
 
+int SAT::sampleBlack(int x, int y, int radius) const
+{
+	int x1 = max(0, x - radius);
+	int x2 = min(w - 1, x + radius);
+	int y1 = max(0, y - radius);
+	int y2 = min(h - 1, y + radius);
+	int area = (x2 - x1 + 1) * (y2 - y1 + 1);
+	return area - query(x1, y1, x2, y2);
+}

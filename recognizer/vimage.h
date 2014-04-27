@@ -86,12 +86,14 @@ public:
 	void white_balance(int x1, int y1, int x2, int y2); // apply white balance, sampling from the selected rectangle
 	int num_different_colors(void) const; // total number of differnt colors, up to 2^24
 	void fix_falloff(void);
+	void enlarge(float factor);
 	void resizeHalf(void);
 	
 	int sample(int x, int y, int size); // check if the square with length `size', centered at `x', `y' is mostly white or black
 	void flipX(); // flip image by X
 	
 	void save(const string& fn);
+	void mark(int x, int y);
 };
 
 #endif // __VIMAGE_H__
