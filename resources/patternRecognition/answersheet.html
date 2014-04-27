@@ -36,8 +36,19 @@
 		}
 
 		window.onload = function() {
-			RenderAnswers(22);
-			RenderVariant(11);
+                    parameters = window.location.search.split('&');
+
+                    answers = parameters[0].split('=')[1];
+
+                    if (parameters[1]) {
+                        variant = parameters[1].split('=')[1];
+                    }
+                    else {
+                        variant = 1
+                    }
+
+	            RenderAnswers(answers);
+		    RenderVariant(variant);
 		}
 	</script>
 	<style>

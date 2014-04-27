@@ -26,11 +26,8 @@ html, body {
 }
 
 #viewer {
-  width: 210mm;
-  height: 297mm;
   display: inline-block;
   margin-left: 10px;
-  background: red;
 }
 
 #viewer section.page, #viewer section.answers {
@@ -78,4 +75,11 @@ ul {
 
 .row .column div.filled {
     background: black;
+}
+
+
+iframe {
+  width: 210mm;
+  height: 297mm;
+  border: none;
 }

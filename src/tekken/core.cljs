@@ -242,7 +242,7 @@
 
 (defn answers-sheet
   "For students."
-  [{:keys [questions]} owner]
+  [{:keys [questions variant per-variant] :as data} owner]
   (reify
     om/IRender
     (render
@@ -250,14 +250,9 @@
      (dom/section
       #js {:id "answers-sheet"
            :className "answers"}
-      (apply dom/div #js {:className "row"}
-             (map-indexed
-              (fn [index {:keys [answers]}]
-                (apply dom/div #js {:className "column"}
-                       (conj
-                        (map (fn [_] (dom/div nil "")) answers)
-                        (dom/div #js {:className "number"} (inc index)))))
-              questions))))))
+      (dom/iframe #js {:src (str "patternRecognition/answersheet.html?"
+                                 "answers=" per-variant "&"
+                                 "variant=" variant)})))))
 
 (defn viewer
   "Test viewer component."
