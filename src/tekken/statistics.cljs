@@ -63,3 +63,25 @@
         data3 (for [l data2]
                 (map #(sum %) l))]
     (zipmap (map #(+ 1 %) (range (count data3))) data3)))
+
+(def results (atom {}))
+
+(defn global-answers [statistics-data]
+  (let [answers (answers-by-variant statistics-data)]
+      (for [variant (keys answers)
+            global (range (count (statistics-data :variants)))
+            :when (= (+ 1 global) variant)]
+        (let [current-variant (nth (statistics-data :variants) global)
+              number-for-current (answers variant)]
+          (for [i (-> (statistics-data :variants) first count range)]
+            (if (contains? @results (nth current-variant i))
+              (swap! results update-in [(nth current-variant i)] + (nth number-for-current i))
+              (swap! results assoc (nth current-variant i) (nth number-for-current i))))))))
+
+(defn all-statistics [statistics-data]
+    {"Student Results" (student-results statistics-data)
+     "Average Points" (average-points statistics-data)
+     "Max Points" (max-points statistics-data)
+     "Min Points" (min-points statistics-data)
+     "Answers by Variants" (answers-by-variant statistics-data)
+     "Answeres by question number" (last (flatten (global-answers statistics-data)))})

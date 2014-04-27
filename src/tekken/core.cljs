@@ -1,6 +1,7 @@
 ;; TODO:
 ;;
 ;; - statistics
+;; - persist state
 ;; - pages remain
 ;; - delete old answers
 ;; - generate variants
@@ -32,7 +33,8 @@
   (.-innerText (util/$ "#template")))
 
 (def data
-  (atom {:test-data {:title "Clojure II"
+  (atom {:render-data nil
+         :test-data {:title "Clojure II"
                      :questions {}
                      :variants 5
                      :per-variant 15}}
@@ -62,17 +64,17 @@
 
 (defn options
   "Options component."
-  [app owner]
+  [{:keys [test-data] :as app} owner]
   (reify
     om/IInitState
     (init-state
      [_]
-     {:variants (:variants app)
-      :per-variant (:per-variant app)
+     {:variants (:variants test-data)
+      :per-variant (:per-variant test-data)
 
       :onTitle
       (fn [e]
-        (om/update! app :title (.. e -target -value)))
+        (om/update! test-data :title (.. e -target -value)))
 
       :onChange
       (fn [k e]
@@ -81,14 +83,21 @@
             (om/set-state! owner k "")
             (do
               (om/set-state! owner k value)
-              (om/update! app k value)))))
+              (om/update! test-data k value)))))
       :onBlur
       (fn [k e]
-        (om/set-state! owner k (k @app)))})
+        (om/set-state! owner k (k @test-data)))
+
+      :onVariantChange
+      (fn [e]
+        (let [v (* 1 (.. e -target -value))]
+          (if (js/isNaN v)
+            (om/update! app :render-data false)
+            (om/update! app :render-data (variant->data @app v)))))})
 
     om/IRenderState
     (render-state
-     [_ {:keys [per-variant variants onChange onBlur onTitle]}]
+     [_ {:keys [per-variant variants onChange onBlur onTitle onVariantChange]}]
      (dom/form
       #js {:id "options"
            :action "javascript: void(0);"}
@@ -96,7 +105,7 @@
       (dom/label nil "Title: ")
       (dom/input
        #js {:type "text"
-            :value (:title app)
+            :value (:title test-data)
             :onChange onTitle})
 
       (dom/label nil "Number of variants: ")
@@ -111,7 +120,13 @@
        #js {:type "text"
             :value per-variant
             :onBlur (partial onBlur :per-variant)
-            :onChange (partial onChange :per-variant)})))))
+            :onChange (partial onChange :per-variant)})
+
+      (dom/label nil "Show variant: ")
+      (dom/input
+       #js {:type "text"
+            :value (:variant (or (:render-data app) {:variant 0}))
+            :onChange onVariantChange})))))
 
 (defn editor
   [{:keys [test-data] :as app} owner]
@@ -154,13 +169,18 @@
 
 (defn preview-button
   "Preview button component."
-  [{:keys [test-data]} owner]
+  [{:keys [test-data] :as app} owner]
   (reify
     om/IInitState
     (init-state
      [_]
      {:onClick
       (fn [_]
+;;         (om/update! app :render-data (variant->data @app 1))
+;;         (.log js/console "Render 1....................")
+;;         (js/setTimeout
+;;          #(do 1)
+;;          1000)
         (let [ch (util/html->canvases)]
           (go
            (let [canvases (<! ch)]
@@ -191,9 +211,6 @@
                   :onMouseLeave onMouseLeave} "Download")
       (dom/div #js {:ref "preview"
                     :className "preview"})))))
-
-
-
 
 (defn answers-key
   "For teachers."
@@ -237,20 +254,21 @@
 
 (defn viewer
   "Test viewer component."
-  [{:keys [test-data] :as app} owner]
+  [{:keys [test-data render-data] :as app} owner]
   (reify
     om/IRender
     (render
      [_]
-     (dom/div
-      #js {:id "viewer"}
-      (dom/section
-       (clj->js {:ref "page"
-                 :className "page"
-                 :dangerouslySetInnerHTML
-                 {:__html (util/edn->html test-data)}}))
-        (om/build answers-key test-data)
-        (om/build answers-sheet test-data)))))
+     (let [data (or render-data test-data)]
+       (dom/div
+        #js {:id "viewer"}
+        (dom/section
+         (clj->js {:ref "page"
+                   :className "page"
+                   :dangerouslySetInnerHTML
+                   {:__html (util/edn->html data)}}))
+        (om/build answers-key data)
+        (om/build answers-sheet data))))))
 
 (defn home-ui
   "Home page ui."
@@ -261,10 +279,11 @@
      [_ {:keys [ch]}]
      (dom/section
       #js {:className "home"}
+      (pr-str app)
       (dom/div
        #js {:id "left"}
        (om/build editor app)
-       (om/build options (:test-data app))
+       (om/build options app)
        (om/build preview-button app))
       (om/build viewer app)))))
 
