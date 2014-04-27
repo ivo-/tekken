@@ -1,13 +1,10 @@
 %html
   %body
-    %form{method: "post", enctype:'multipart/form-data'}
-      %h2 How many answers are on the test?
-      %input{type: 'text', style: "width: 20px", name: 'count_test'}
-      %h2 How many digits does the ID number contain?
-      %input{type: 'text', style: "width: 20px", name: 'count_number'}
-      %h2 How many answers does each question have?
-      %input{type: 'text', style: "width: 20px", name: 'count_answers'}
-      %h2 Upload Test Photo
+    %form{method: "post", enctype: 'multipart/form-data'}
+      %h2 Test Upload
+      %input{type: 'text', value: @count_test, style: "display: none; width: 20px", name: 'count_test'}
+      %input{type: 'text', value: 5, style: "display: none; width: 20px", name: 'count_number'}
+      %input{type: 'text', value: 4, style: "display: none; width: 20px", name: 'count_answers'}
       %input{type: 'file', name: 'testfile', multiple: true}
       %br
       %input{type: 'submit', value:'Upload!'}
