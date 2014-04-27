@@ -1,11 +1,16 @@
+;; STATISTICS:
+;;
+;; - couple verification with app state
+;; - allow dirct data paste
+;;
 ;; TODO:
 ;;
-;; - statistics
-;; - persist state
 ;; - delete old answers
-;; - generate variants
-;; - generate answer-sheets
-;; - generate answer-keys
+;;
+;; Design:
+;;
+;; - answer-sheets
+;; - answer-keys
 ;;
 ;; Someday:
 ;;
@@ -29,12 +34,14 @@
   (.-innerText (util/$ "#template")))
 
 (def data
-  (atom {:render-data nil
-         :test-data {:title "Clojure II"
-                     :questions {}
-                     :variants 5
-                     :per-variant 15}}
-        :variants []))
+  (atom (or (util/store "app")
+            {:render-data nil
+
+             :test-data {:title "Clojure II"
+                         :questions {}
+                         :variants 5
+                         :per-variant 15}
+             :variants []})))
 
 (defn test-data->variants
   [{:keys [questions per-variant variants] :as state}]
@@ -86,8 +93,8 @@
 
       :onVariantChange
       (fn [e]
-        (let [v (* 1 (.. e -target -value))]
-          (if (js/isNaN v)
+        (let [v (.val (js/$ (.. e -target)))]
+          (if (= v "whole")
             (om/update! app :render-data false)
             (om/update! app :render-data (variant->data @app v)))))})
 
@@ -119,10 +126,14 @@
             :onChange (partial onChange :per-variant)})
 
       (dom/label nil "Show variant: ")
-      (dom/input
-       #js {:type "text"
-            :value (:variant (or (:render-data app) {:variant 0}))
-            :onChange onVariantChange})))))
+      (apply dom/select
+             #js {:onChange onVariantChange
+                  :value (:variant (or (:render-data app)
+                                       {:variant "whole"}))}
+             (map #(dom/option #js {:value %} %)
+                  (->> (:variants test-data)
+                       (range 0)
+                       (cons "whole"))))))))
 
 (defn editor
   [{:keys [test-data] :as app} owner]
@@ -172,11 +183,11 @@
      [_]
      {:onClick
       (fn [_]
-;;         (om/update! app :render-data (variant->data @app 1))
-;;         (.log js/console "Render 1....................")
-;;         (js/setTimeout
-;;          #(do 1)
-;;          1000)
+        ;;         (om/update! app :render-data (variant->data @app 1))
+        ;;         (.log js/console "Render 1....................")
+        ;;         (js/setTimeout
+        ;;          #(do 1)
+        ;;          1000)
         (let [ch (util/html->canvases)]
           (go
            (let [canvases (<! ch)]
@@ -185,16 +196,16 @@
       :onMouseEnter
       (fn [_]
         #_(let [ch (util/html->canvases)]
-          (go
-           (let [canvases (<! ch)
-                 node (om/get-node owner "preview")]
-             (aset node "innerHTML" "")
-             (doall (map #(.appendChild node %) canvases))))))
+            (go
+             (let [canvases (<! ch)
+                   node (om/get-node owner "preview")]
+               (aset node "innerHTML" "")
+               (doall (map #(.appendChild node %) canvases))))))
 
       :onMouseLeave
       (fn [_]
         #_(-> (om/get-node owner "preview")
-            (aset "innerHTML" "")))})
+              (aset "innerHTML" "")))})
 
     om/IRenderState
     (render-state
@@ -220,14 +231,14 @@
            :className "answers"}
       (apply dom/div #js {:className "row"}
              (map-indexed
-               (fn [index {:keys [answers]}]
-                 (apply dom/div #js {:className "column"}
-                        (conj
-                          (map (fn [value]
-                                 (dom/div #js {:className (if value "filled")}))
-                               answers)
-                          (dom/div #js {:className "number"} (inc index)))))
-               questions))))))
+              (fn [index {:keys [answers]}]
+                (apply dom/div #js {:className "column"}
+                       (conj
+                        (map (fn [value]
+                               (dom/div #js {:className (if value "filled")}))
+                             answers)
+                        (dom/div #js {:className "number"} (inc index)))))
+              questions))))))
 
 (defn answers-sheet
   "For students."
@@ -241,17 +252,22 @@
            :className "answers"}
       (apply dom/div #js {:className "row"}
              (map-indexed
-               (fn [index {:keys [answers]}]
-                 (apply dom/div #js {:className "column"}
-                        (conj
-                          (map (fn [_] (dom/div nil "")) answers)
-                          (dom/div #js {:className "number"} (inc index)))))
-               questions))))))
+              (fn [index {:keys [answers]}]
+                (apply dom/div #js {:className "column"}
+                       (conj
+                        (map (fn [_] (dom/div nil "")) answers)
+                        (dom/div #js {:className "number"} (inc index)))))
+              questions))))))
 
 (defn viewer
   "Test viewer component."
   [{:keys [test-data render-data] :as app} owner]
   (reify
+    om/IDidUpdate
+    (did-update
+     [_ _ _]
+     (util/store "app" app))
+
     om/IRender
     (render
      [_]
