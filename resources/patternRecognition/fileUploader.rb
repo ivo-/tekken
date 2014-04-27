@@ -30,12 +30,12 @@ class ResultParser
 
         JSON.generate(answer_list)
         "<script>
-          window.postMessage('#{JSON.generate(answer_list)}')
+          window.postMessage('#{JSON.generate(answer_list)}','*')
         </script>"
       end
     else
       "<script>
-        window.postMessage('false')
+        window.postMessage('false','*')
       </script>"
     end
   end
