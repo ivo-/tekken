@@ -1,7 +1,7 @@
 ;; STATISTICS:
 ;;
-;; - couple verification with app state
 ;; - allow dirct data paste
+;; - print key
 ;;
 ;; TODO:
 ;;
@@ -185,11 +185,6 @@
      [_]
      {:onClick
       (fn [_]
-        ;;         (om/update! app :render-data (variant->data @app 1))
-        ;;         (.log js/console "Render 1....................")
-        ;;         (js/setTimeout
-        ;;          #(do 1)
-        ;;          1000)
         (let [ch (util/html->canvases)]
           (go
            (let [canvases (<! ch)]

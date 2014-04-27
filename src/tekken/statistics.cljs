@@ -85,3 +85,38 @@
      "Min Points" (min-points statistics-data)
      "Answers by Variants" (answers-by-variant statistics-data)
      "Answeres by question number" (last (flatten (global-answers statistics-data)))})
+
+;; ==================================================================
+;; Example
+
+;; (def statistics-data
+;;    "Данните които се подават при проверка на решенията и правене на статистика.
+;;     Key е масив от правилните отговори за всички варианти.
+;;     Data са всички попълнени тестове, които искаме да проверим"
+;;    {:variants [[6 7 3] [2 6 3] [1 7 4]]
+;;     :key  [[1 2 3] [1 1 1] [2 3 1]]
+;;     :data [{:id 1
+;;             :variant 1
+;;             :answers [1 3 1]}
+
+;;            {:id 2
+;;             :variant 2
+;;             :answers [1 3 1]}
+
+;;            {:id 3
+;;             :variant 1
+;;             :answers [1 2 3]}
+
+;;            {:id 4
+;;             :variant 3
+;;             :answers [2 3 2]}
+
+;;            {:id 5
+;;             :variant 3
+;;             :answers [2 3 1]}
+
+;;            {:id 6
+;;             :variant 3
+;;             :answers [1 3 1]}]})
+
+;; (all-statistics statistics-data)
