@@ -1,6 +1,7 @@
 (ns tekken.verification
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [om.core :as om :include-macros true]
+  (:require [tekken.statistics :as stats]
+            [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [cljs.core.async :as async :refer [put! <! >! chan map>]]))
 
@@ -18,8 +19,28 @@
 (defn new-solution
   [{:keys [test-data]}]
   {:id ""
-   :variant 1
+   :variant "1"
    :answers (gen-answers (:per-variant test-data))})
+
+;; ==================================================================
+;; Statistics
+
+(defn get-statistics-data
+  [{:keys [variants solutions] :as d}]
+  (let [test-key
+        (->> (map-indexed identity variants)
+             (map (partial tekken.core/variant->data d))
+             (map :questions)
+             (map (fn [q] (->> q
+                               (map :answers)
+                               (map (partial map-indexed vector))
+                               (map (partial filter #(= true (second %))))
+                               (map (partial map first))
+                               (flatten)
+                               (vec)))))]
+    (stats/all-statistics {:variants variants
+                           :key test-key
+                           :data solutions})))
 
 ;; ==================================================================
 ;; Complements
@@ -85,12 +106,12 @@
      {:onIdChange
       (fn [e]
         (let [v (.. e -target -value)]
-          (om/update! solution :id v)))
+          (om/update! (om/get-props owner) :id v)))
 
       :onVariantChange
       (fn [e]
         (let [v (.val (js/$ (.. e -target)))]
-          (om/update! solution :variant v)))
+          (om/update! (om/get-props owner) :variant v)))
 
       :onSolutionComplete
       (fn [e]
@@ -117,7 +138,8 @@
              #js {:onChange onVariantChange
                   :value variant}
              (map #(dom/option #js {:value %} %)
-                  (range 1 (inc variants-count))))
+                  (->> (inc variants-count)
+                       (range 1))))
 
       (dom/div nil "Отговори: ")
       (apply dom/div nil
@@ -156,12 +178,16 @@
           :end
           (do
             (om/set-state! owner :show false)
-            (->> @solutions
-                 (butlast)
-                 (mapv (fn [student]
-                         (-> student
-                             (update-in [:answers]
-                                        (partial mapv :value)))))
+            (om/transact!
+             solutions
+             #(->> %
+                   (butlast)
+                   (mapv
+                    (fn [student]
+                      (-> student
+                          (update-in [:answers]
+                                     (partial mapv :value)))))))
+            (->> (get-statistics-data @app)
                  (pr-str)
                  (.log js/console))))
         (recur))))
@@ -171,7 +197,6 @@
      [_ {:keys [ch show]}]
      (dom/div
       #js {:id "verification"}
-
       (if show
         (dom/div
          nil
@@ -191,7 +216,5 @@
               :onClick #(do (om/set-state! owner :show true)
                           (om/update! solutions [(new-solution @app)]))}
          "Започни въвеждане на решения"))))))
-
-
 
 
