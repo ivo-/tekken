@@ -87,8 +87,9 @@ void VImage::binarize(int threshold)
 	}
 }
 
-VImage::VImage(const wxImage& img): VImage(img.GetWidth(), img.GetHeight())
+VImage::VImage(const wxImage& img)
 {
+	construct_empty(img.GetWidth(), img.GetHeight());
 	FOR(y, h) FOR(x, w) {
 		data[y * w + x] = RGBA(img.GetRed(x, y), img.GetGreen(x, y), img.GetBlue(x, y));
 	}
