@@ -179,7 +179,7 @@ vector<Pt> findMarkers(VImage& image)
 const float dH = 34.5, dV = 30.3;
 int cellsize = 8;
 
-int grid(VImage& image, float x, float y, int entries, float dx, float dy)
+int grid(const char* name, int pidx, const VImage& bin, VImage& image, float x, float y, int entries, float dx, float dy)
 {
 	int stats[entries];
 	FOR(i, entries) {
@@ -188,11 +188,11 @@ int grid(VImage& image, float x, float y, int entries, float dx, float dy)
 		int cy = round(y + dy * i);
 		for (int py = cy - cellsize; py <= cy + cellsize; py++)
 			for (int px = cx - cellsize; px <= cx + cellsize; px++) {
-				stats[i] += image.getpixel(px, py).sum();
+				stats[i] += bin.getpixel(px, py).r;
 				image.mark(px, py);
 			}
 	}
-//	printf("grid(%f, %f, %d, %f, %f) = {", x, y, entries, dx, dy);
+//	printf("%s %d: {", name, pidx);
 //	FOR(i, entries) {
 //		if (i) printf(", ");
 //		printf("%d", stats[i]);
@@ -202,9 +202,7 @@ int grid(VImage& image, float x, float y, int entries, float dx, float dy)
 	FOR(i, entries) s.push_back(make_pair(float(max(1, stats[i])), i));
 	sort(s.begin(), s.end());
 	
-	int idx = 0;
-	while (idx < entries - 1 && s[idx + 1].first / s[idx].first < 1.02f) idx++;
-	if (idx > 0) return -1; 
+	if (s[1].first / s[0].first < 1.02f) return -1;
 	return s[0].second;
 }
 
@@ -232,7 +230,7 @@ TestData recognize(VImage& image)
 	//
 	float x = sX, y = sY;
 	FOR(fni, numFn) {
-		td.fn[fni] = grid(image, x, y, 10, dH, 0);
+		td.fn[fni] = grid("fn", fni, bin, image, x, y, 10, dH, 0);
 		y += dV;
 	}
 	
@@ -240,7 +238,7 @@ TestData recognize(VImage& image)
 	y += spacer1;
 	
 	FOR(qi, min(15, numQ)) {
-		td.answers[qi] = grid(image, x, y, numA, 0, dV);
+		td.answers[qi] = grid("Qs", qi + 1, bin, image, x, y, numA, 0, dV);
 		x += dH;
 	}
 	
@@ -250,7 +248,7 @@ TestData recognize(VImage& image)
 	y += spacer2;
 	
 	for (int qi = 15; qi < numQ; qi++) {
-		td.answers[qi] = grid(image, x, y, numA, 0, dV);
+		td.answers[qi] = grid("Qs", qi + 1, bin, image, x, y, numA, 0, dV);
 		x += dH;
 	}
 
