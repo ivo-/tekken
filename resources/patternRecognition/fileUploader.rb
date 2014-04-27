@@ -8,7 +8,7 @@ end
 
 post "/upload" do
   Process.fork do
-    exec("./recognizer/recognizer #{params['testfile'][:tempfile].path} #{params['count_test']} 4 5 ./results.txt")
+    exec("./recognizer/recognizer #{params['testfile'][:tempfile].path} #{params['count_test']} #{params['count_answers']} #{params['count_number']} ./results.txt")
     # exec("cat #{params['testfile'][:filename]}")
   end
   Process.wait()
