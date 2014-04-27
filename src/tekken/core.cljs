@@ -223,7 +223,7 @@
 
 (defn answers-key
   "For teachers."
-  [{:keys [questions]} owner]
+  [{:keys [questions variant] as data} owner]
   (reify
     om/IRender
     (render
@@ -231,20 +231,22 @@
      (dom/section
       #js {:id "answers-key"
            :className "answers"}
-      (apply dom/div #js {:className "row"}
-             (map-indexed
-              (fn [index {:keys [answers]}]
-                (apply dom/div #js {:className "column"}
-                       (conj
-                        (map (fn [value]
-                               (dom/div #js {:className (if value "filled")}))
-                             answers)
-                        (dom/div #js {:className "number"} (inc index)))))
-              questions))))))
+      (apply
+        dom/div #js {:className "row"}
+        (dom/h3 nil (str "Answers sheet"
+                         (and variant (str " for variant " variant))))
+        (map-indexed
+          (fn [index {:keys [answers]}]
+            (apply
+              dom/div
+              #js {:className "column"}
+              (dom/div #js {:className "number"} (inc index))
+              (map  #(dom/div #js {:className (if % "filled")}) answers)))
+          questions))))))
 
 (defn answers-sheet
   "For students."
-  [{:keys [questions]} owner]
+  [{:keys [questions variant per-variant] :as data} owner]
   (reify
     om/IRender
     (render
@@ -252,14 +254,9 @@
      (dom/section
       #js {:id "answers-sheet"
            :className "answers"}
-      (apply dom/div #js {:className "row"}
-             (map-indexed
-              (fn [index {:keys [answers]}]
-                (apply dom/div #js {:className "column"}
-                       (conj
-                        (map (fn [_] (dom/div nil "")) answers)
-                        (dom/div #js {:className "number"} (inc index)))))
-              questions))))))
+      (dom/iframe #js {:src (str "patternRecognition/answersheet.html?"
+                                 "answers=" per-variant "&"
+                                 "variant=" variant)})))))
 
 (defn viewer
   "Test viewer component."

@@ -28,17 +28,23 @@ class VImage {
 		if (y >= h) y = h - 1;
 		return y;
 	}
+	void construct_empty(int x, int y)
+	{
+		w = x;
+		h = y;
+		gain = 1.0f;
+		data = new RGBA[w*h];
+		memset(data, 0, w * h * sizeof(RGBA));
+	}
 	float gain;
 public:
 	int w, h;
 	RGBA* data;
 
 	VImage(const wxImage& img);
-	VImage(int w, int h): w(w), h(h)
+	VImage(int w, int h)
 	{
-		gain = 1.0f;
-		data = new RGBA[w*h];
-		memset(data, 0, w * h * sizeof(RGBA));
+		construct_empty(w, h);
 	}
 	VImage(const VImage& rhs)
 	{
