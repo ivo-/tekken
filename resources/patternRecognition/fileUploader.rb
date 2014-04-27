@@ -29,9 +29,14 @@ class ResultParser
         end
 
         JSON.generate(answer_list)
+        "<script>
+          window.postMessage('#{JSON.generate(answer_list)}')
+        </script>"
       end
     else
-      "too bad photo"
+      "<script>
+        window.postMessage('false')
+      </script>"
     end
   end
 end
