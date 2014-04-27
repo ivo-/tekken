@@ -1,5 +1,7 @@
 ;; TODO:
 ;;
+;; - statistics
+;; - pages remain
 ;; - delete old answers
 ;; - generate variants
 ;; - generate answer-sheets
@@ -29,11 +31,31 @@
 (def template
   (.-innerText (util/$ "#template")))
 
-(defonce data
+(def data
   (atom {:test-data {:title "Clojure II"
                      :questions {}
                      :variants 5
-                     :per-variant 15}}))
+                     :per-variant 15}}
+        :variants []))
+
+(defn test-data->variants
+  [{:keys [questions per-variant variants] :as state}]
+  (->> #(->> questions
+             (map-indexed identity)
+             (shuffle)
+             (take per-variant)
+             (vec))
+       (repeatedly variants)
+       (vec)))
+
+(defn variant->data
+  [{:keys [variants test-data] :as state} n]
+  (assoc
+    (->> (nth variants n)
+         (mapv (:questions test-data))
+         (assoc test-data :questions))
+    :variant
+    n))
 
 ;; ============================================================================
 ;; Components
@@ -101,9 +123,15 @@
       :onChange
       (fn [_]
         (let [value (->> (om/get-node owner "text")
-                         (.-value))]
+                         (.-value))
+              edn (util/md->edn value)]
           (om/set-state! owner :text value)
-          (om/update! test-data :questions (util/md->edn value))))})
+
+          ;; Good enough for the demo
+          (om/transact! app (fn [s]
+                              (let [v (-> (assoc-in s [:test-data :questions] edn))]
+                                (->> (test-data->variants (:test-data v))
+                                     (assoc-in v [:variants])))))))})
 
     om/IDidMount
     (did-mount
@@ -190,7 +218,7 @@
 
 (defn viewer
   "Test viewer component."
-  [{:keys [test-data]} owner]
+  [{:keys [test-data] :as app} owner]
   (reify
     om/IRender
     (render
@@ -202,8 +230,8 @@
                  :className "page"
                  :dangerouslySetInnerHTML
                  {:__html (util/edn->html test-data)}}))
-      (om/build answers-key test-data)
-      (om/build answers-sheet test-data)))))
+        (om/build answers-key test-data)
+        (om/build answers-sheet test-data)))))
 
 (defn home-ui
   "Home page ui."
