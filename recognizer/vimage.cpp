@@ -6,7 +6,7 @@
 
 void VImage::fix_falloff(void)
 {
-	const int N = 10;
+	const int N = 24;
 	double intensity[N][N] = {};
 	int alle[N][N] = {};
 	FOR(y, h) FOR(x, w) {
@@ -110,5 +110,55 @@ void VImage::to_grayscale(void)
 	for (int i = 0; i < w*h; i++) {
 		uint8 mid = (uint8) (((unsigned) data[i].r + (unsigned) data[i].g + (unsigned) data[i].b) / 3);
 		data[i].r = data[i].g = data[i].b = mid;
+	}
+}
+
+void VImage::resizeHalf(void)
+{
+	//return;
+	int nw = w/2;
+	int nh = h/2;
+	RGBA* ndata = new RGBA[nw * nh];
+	FOR(y, nh)
+		FOR(x, nw) {
+			int r = 4, g = 2, b = 2;
+			r += data[(y * 2    )*w + x * 2    ].r;
+			g += data[(y * 2    )*w + x * 2    ].g;
+			b += data[(y * 2    )*w + x * 2    ].b;
+			r += data[(y * 2    )*w + x * 2 + 1].r;
+			g += data[(y * 2    )*w + x * 2 + 1].g;
+			b += data[(y * 2    )*w + x * 2 + 1].b;
+			r += data[(y * 2 + 1)*w + x * 2    ].r;
+			g += data[(y * 2 + 1)*w + x * 2    ].g;
+			b += data[(y * 2 + 1)*w + x * 2    ].b;
+			r += data[(y * 2 + 1)*w + x * 2 + 1].r;
+			g += data[(y * 2 + 1)*w + x * 2 + 1].g;
+			b += data[(y * 2 + 1)*w + x * 2 + 1].b;
+			ndata[y * nw + x] = RGBA(r/4, g/4, b/4);
+		}
+	delete[] data;
+	data = ndata;
+	w = nw;
+	h = nh;
+}
+
+int VImage::sample(int x, int y, int size)
+{
+	if (size % 2 == 0) size++;
+	int sum = 0;
+	for (int dy = -size/2; dy <= size/2; dy++)
+		for (int dx = -size/2; dx <= size/2; dx++)
+			sum += !!getpixel(x + dx, y + dy).r;
+	return sum > size*size/2;
+}
+void VImage::flipX()
+{
+	FOR(y, h) {
+		int i = 0, j = w - 1;
+		while (i < j) {
+			swap(data[y * w + i], data[y * w + j]);
+			i++;
+			j--;
+		}
 	}
 }

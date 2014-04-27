@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="/home/vesko/samplephotos/IMG_20140426_185902.jpg 20 4 5 /home/vesko/result.png" />
+				<Option parameters="/home/vesko/samplephotos/4.jpg 15 4 5 /home/vesko/result.png" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-std=c++11" />
@@ -41,10 +41,13 @@
 			<Add option="`wx-config --libs`" />
 		</Linker>
 		<Unit filename="imageprocess.cpp" />
+		<Unit filename="imageprocess.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.h" />
 		<Unit filename="perspective.cpp" />
 		<Unit filename="perspective.h" />
+		<Unit filename="sat.cpp" />
+		<Unit filename="sat.h" />
 		<Unit filename="types.h" />
 		<Unit filename="utils.h" />
 		<Unit filename="vimage.cpp" />

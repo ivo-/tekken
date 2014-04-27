@@ -25,6 +25,11 @@ struct Pt {
 	{
 		x *= m; y *= m;
 	}
+	void operator /= (double m)
+	{
+		m = 1.0 / m;
+		x *= m; y *= m;
+	}
 	void operator += (const Pt& rhs)
 	{
 		x += rhs.x; y += rhs.y;
@@ -67,6 +72,30 @@ inline Pt operator * (double m, const Pt& a)
 	return Pt(a.x * m, a.y * m);
 }
 
+inline double dist(const Pt& a, const Pt& b)
+{
+	return (a - b).length();
+}
+
+inline double area(const Pt& a, const Pt& b, const Pt& c)
+{
+	return a.x * b.y + b.x * c.y + c.x * a.y - c.x * b.y - b.x * a.y - a.x * c.y;
+}
+
+
+// get the angle ABC in degrees
+inline double getAngle(const Pt& a, const Pt& b, const Pt& c)
+{
+	Pt v1 = a - b;
+	Pt v2 = c - b;
+	v1.normalize();
+	v2.normalize();
+	double dot = v1 * v2;
+	if (dot > 1) dot = 1;
+	if (dot < -1) dot = -1;
+	double angle = acos(v1 * v2);
+	return angle / M_PI * 180;
+}
 
 // End file `types.h':
 // Start file `linear_algebra.h':
