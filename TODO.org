@@ -1,9 +1,14 @@
 * TODO:
 
-- [ ] Image recognition -> js
-- [ ] Statistics check
-- [ ] Persistence
-- [ ] Diagrams
-- [ ] Recognizer tests in /test
-- [ ] Separate components
-- [ ] Github url
+- [ ] Add demo URL
+- [ ] Separate components and cleanup code base
+
+- [ ] Generate better statistics and diagrams
+- [ ] Add data persistence
+- [ ] Make JavaScript port of the recognizer
+- [ ] Add Recognizer tests images in /test
+
+- [ ] Separate answers and tests PDFs
+- [ ] Multiple variants of answer sheets
+- [ ] Options for what to generate
+- [ ] Try PDF generator's html functionality
