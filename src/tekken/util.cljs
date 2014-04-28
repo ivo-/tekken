@@ -2,27 +2,11 @@
   (:require [cljs.core.async :refer [chan put!]]
             [cljs.reader :as reader]))
 
-(defn html->canvases
+(defn build
   []
   (let [ch (chan)]
-      (js/get_pdf_pages #(put! ch (vec %)))
-      ch))
-
-(defn canvases->pdf
-  [canvases]
-  (let [pdfdoc (js/jsPDF. "p" "mm" "a4")
-        lastcvs (last canvases)]
-    (doseq [cvs canvases]
-      (let [data-url (. cvs toDataURL "image/jpeg")]
-        (. pdfdoc addImage data-url 0 0 210 297)
-        (when-not (= cvs lastcvs)
-          (. pdfdoc addPage))))
-    (. pdfdoc output "datauristring")))
-
-(defn make-zip
-  "TODO:"
-  []
-  nil)
+    (js/get_pdf_pages #(put! ch %))
+    ch))
 
 (defn md->html
   [s]

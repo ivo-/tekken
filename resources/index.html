@@ -108,6 +108,7 @@
         <script src="html2canvas.js"></script>
         <script src="jszip.min.js"></script>
         <script src="markdown.js"></script>
+        <script src="FileSaver.js"></script>
         <script src="react-0.8.0.js"></script>
 
         <script src="../target/dev/goog/base.js" type="text/javascript"></script>
@@ -132,39 +133,38 @@
          };
 
          var get_pdf_pages = function(callback) {
-             var variants = $("#variants div.variant");
-
              var vcount = 0;
-             var results = [];
+             var zip = new JSZip();
+             var variants = $("#variants div.variant");
 
              variants.each(function(){
                  pagify(this);
              });
 
              $.map(variants, function(variant, i) {
+                 var doc = new jsPDF("p", "mm", "a4");
                  var pages = $("section.page, section.answers", variant);
                  var pcount = 0;
+
                  return $.map(pages, function(page){
                      return html2canvas(page, {onrendered: function(canvas) {
-                         results.push(canvas);
+                         doc.addImage(canvas.toDataURL("image/jpeg"), 0, 0, 210, 297);
+                         doc.addPage();
+
                          if (++pcount == pages.length) {
-                             if (++vcount == variants.length) {
-                                 callback(results);
+                             ++vcount;
+                             doc.output("dataurlnewwindow");
+                             zip.file(vcount + ".pdf", doc.output());
+
+                             if (vcount == variants.length) {
+                                 saveAs(zip.generate({type:"blob"}), "test.zip");
+                                 callback(true);
                              }
                          }
                      }});
                  });
              });
          };
-
-         function genzip() {
-             var zip = new JSZip();
-             zip.file("Hello.txt", "Hello World\n");
-             var img = zip.folder("images");
-             /* img.file("smile.jpg", imgData, {base64: true}); */
-             var content = zip.generate();
-             location.href="data:application/zip;base64,"+content;
-         }
         </script>
     </body>
 </html>

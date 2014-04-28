@@ -141,10 +141,10 @@
     (did-update
       [_ _ _]
       (when (pos? (count (:variants app)))
-        (let [ch (util/html->canvases)]
+        (let [ch (util/build)]
           (go
-            (let [canvases (<! ch)]
-              (aset js/window "location" (util/canvases->pdf canvases)))))))
+           (js/alert (<! ch))
+           (om/update! app :variants [])))))
 
     om/IRenderState
     (render-state
