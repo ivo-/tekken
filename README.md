@@ -1,4 +1,16 @@
-# TEKKEN
+# Tekken
+
+Tekken is highly experimental client-side test generator based on a
+number of open source projects:
+
+* [ClojureScript](https://github.com/clojure/clojurescript)
+* [Om](https://github.com/swannodette/om)
+* [JSZip](http://stuk.github.io/jszip/)
+* [html2canvas](https://github.com/niklasvh/html2canvas/)
+* [jsPDF](https://github.com/MrRio/jsPDF/)
+* [markdown-js](https://github.com/evilstreak/markdown-js)
+
+and others.
 
 ## Notes
 

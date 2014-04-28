@@ -6,3 +6,4 @@
 - [ ] Diagrams
 - [ ] Recognizer tests in /test
 - [ ] Separate components
+- [ ] Github url
