@@ -7,7 +7,9 @@
         <!-- <link rel="stylesheet" type="text/css" href="bootstrap.min.css"> -->
     </head>
     <body>
-        <div id="verification"></div>
+        <div id="overlay">
+            <h1>Building...</h1>
+        </div>
         <div id="main"></div>
         <script type="text/markdown" id="template">
 Коя година сме?
@@ -132,7 +134,8 @@
              }
          };
 
-         var get_pdf_pages = function(callback) {
+         var tekken_build = function(callback) {
+             $("#overlay").show();
              var vcount = 0;
              var zip = new JSZip();
              var variants = $("#variants div.variant");
@@ -153,11 +156,11 @@
 
                          if (++pcount == pages.length) {
                              ++vcount;
-                             /* doc.output("dataurlnewwindow"); */
-                             zip.file(vcount + ".pdf", doc.output());
+                             zip.file(vcount + ".pdf", doc.output(), {binary: true});
 
                              if (vcount == variants.length) {
                                  saveAs(zip.generate({type:"blob"}), "test.zip");
+                                 $("#overlay").hide();
                                  callback(true);
                              }
                          }

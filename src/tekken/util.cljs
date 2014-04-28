@@ -5,7 +5,7 @@
 (defn build
   []
   (let [ch (chan)]
-    (js/get_pdf_pages #(put! ch %))
+    (js/tekken_build #(put! ch %))
     ch))
 
 (defn md->html

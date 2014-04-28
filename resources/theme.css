@@ -9,6 +9,32 @@ html, body {
     position: relative;
 }
 
+#overlay {
+    top: 0px;
+    left: 0px;
+    position: fixed;
+    z-index: 200;
+
+    width: 100%;
+    height: 100%;
+    display: none;
+
+    background-color: rgba(0,0,0,0.6);
+}
+
+#overlay h1 {
+    width: 100%;
+    height: 40px;
+    margin-top: -20px;
+    text-align: center;
+
+    top: 50%;
+    left: 0%;
+    position: absolute;
+
+    background-color: white;
+}
+
 #left {
     width: 40%;
     overflow: hidden;
@@ -46,7 +72,7 @@ html, body {
 }
 
 #variants {
-/* display: none; */
+    margin-top: 500px;
 }
 
 #page {
