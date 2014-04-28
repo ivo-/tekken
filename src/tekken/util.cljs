@@ -2,12 +2,6 @@
   (:require [cljs.core.async :refer [chan put!]]
             [cljs.reader :as reader]))
 
-(defn $
-  [x]
-  (if (string? x)
-    (js/document.querySelector x)
-    x))
-
 (defn html->canvases
   []
   (let [ch (chan)]
@@ -26,19 +20,9 @@
     (. pdfdoc output "datauristring")))
 
 (defn make-zip
+  "TODO:"
   []
-
-;;   function genzip()
-;;   {
-;;    var zip = new JSZip();
-;;    zip.file("Hello.txt", "Hello World\n");
-;;    var img = zip.folder("images");
-;;    /* img.file("smile.jpg", imgData, {base64: true}); */
-;;    var content = zip.generate();
-;;    location.href="data:application/zip;base64,"+content;
-;;    }
-
-  )
+  nil)
 
 (defn md->html
   [s]
@@ -98,10 +82,10 @@
          (vec))))
 
 (defn edn->html
-  [{:keys [questions title]}]
+  [{:keys [questions title variant]}]
   (->> (map :text questions)
        (reduce concat)
-       (cons ["i" "Вариант: А"])
+       (cons ["i" (str "Вариант: " variant)])
        (cons ["i" "Група:......"])
        (cons ["i" "ФН:......"])
        (cons ["i" "Име:..........................................................................................."])
@@ -109,12 +93,3 @@
        (cons "html")
        (clj->js)
        (.renderJsonML js/Markdown)))
-
-(defn store
-  ([ns] (store ns nil))
-  ([ns edn]
-    (if-not (nil? edn)
-      (.setItem js/localStorage ns (pr-str edn))
-      (let [s (.getItem js/localStorage ns)]
-        (when-not (nil? s)
-          (reader/read-string s))))))

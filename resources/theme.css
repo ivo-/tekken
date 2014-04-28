@@ -1,53 +1,90 @@
 html, body {
-  background: white;
-  padding: 0px;
-  margin: 10px;
+    background: white;
+    padding: 0px;
+    margin: 10px;
 }
 
-
 #main {
-  overflow: hidden;
-  position: relative;
+    overflow: hidden;
+    position: relative;
 }
 
 #left {
-  width: 500px;
-  overflow: hidden;
-  display: inline-block;
-
-  float: left;
+    width: 40%;
+    overflow: hidden;
+    display: inline-block;
+    float: left;
+    padding-top: 55px;
 }
 
 #editor textarea {
-  margin: 0 auto;
-  padding: 0px;
-  width: 495px;
-  height: 500px;
+    margin: 0 auto;
+    padding: 0px;
+    width: 495px;
+    height: 500px;
+    width: 100%;
+}
+
+#main a {
+    background-color: #FFFFFF;
+}
+
+.field-group {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.field-group label {
+    display: block;
+    font-weight: bold;
 }
 
 #viewer {
-  display: inline-block;
-  margin-left: 10px;
+    width: 58%;
+    display: inline-block;
+    margin-left: 10px;
 }
 
-#viewer section.page, #viewer section.answers {
-  width: 190mm;
-  height: 277mm;
-  overflow: hidden;
-  background: white;
-  padding: 10mm;
+#variants {
+/* display: none; */
 }
 
-#viewer section.page header {
+#page {
+    width: 210mm;
+    overflow: hidden;
+    background: white;
+    position: relative;
 
+    padding: 8mm 18mm 8mm 18mm;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+#variants section.page,
+#variants section.answers {
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+    background: white;
+    position: relative;
+
+    padding: 8mm 18mm 8mm 18mm;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.answers-key h1, .answers-sheet h1 {
+    font-size: 2em;
+    text-align: center;
 }
 
 #options input {
-  display: block;
+    display: block;
 }
 
 code {
-  white-space: pre;
+    white-space: pre;
 }
 
 ul {
@@ -58,28 +95,74 @@ ul {
 .row .column {
     display: inline-block;
     width: 6.5%;
+    margin-bottom: 6mm;
 }
 
 .row .column div {
-    width: 5mm;
-    height: 5mm;
-    border: 4px solid black;
-    margin: 10px;
+    width: 4mm;
+    height: 4mm;
+    border: 1mm solid black;
+    text-align: center;
+    /* margin: 10px; */
+    margin-top: 6mm;
+    font-size: 13px;
+}
+
+.row .column div:first-child {
+    margin-top: 0;
 }
 
 .row .column div.number {
     border: none;
     text-align: center;
-    margin: 14px;
+    font-weight: bold;
+    font-size: 1em;
 }
 
 .row .column div.filled {
     background: black;
 }
 
+div.marker {
+    width: 10mm;
+    height: 10mm;
+    background: black;
+    /* Good enough for the demo */
+    /*     background-image: url('patternRecognition/marker.png'); */
+    display: inline-block;
+}
 
-iframe {
-  width: 210mm;
-  height: 297mm;
-  border: none;
+.top-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.top-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.bottom-left {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.bottom-right {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.top-center {
+    position: absolute;
+    top: 0;
+    left: 110mm;
+}
+
+.boxname {
+    border: 1mm solid black;
+    padding: 2mm;
 }

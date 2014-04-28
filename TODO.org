@@ -1,0 +1,12 @@
+* TODO:
+
+- [X] Just render on page by default
+- [X] Stop preview of variants
+- [ ] Image recognition -> js
+- [ ] Download all
+- [ ] Statistics check
+- [ ] Persistence
+- [ ] Diagrams
+- [ ] On download render variants, run pagify and download
+- [ ] Recognizer tests in /test
+- [ ] Separate components
