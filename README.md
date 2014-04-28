@@ -12,30 +12,6 @@
     * Build the code
     * `open resources/index.html`
 
-- Interop
-
-```clojure
-;; Access global variables
-js/$
-js/document
-js/document.body.firstChild
-
-;; Get property
-(.-firstChild js/document)
-
-;; Get/Set property
-(aget js/document "title")
-(aset js/document "title" "New")
-
-;; Invoke method
-(js/alert 10)
-(. js/document getElementById "my-app")
-(. alert js/window "Call method.")
-
-;; Make native js class
-(js/Array.)
-```
-
 ## License
 
 The MIT License (MIT)
