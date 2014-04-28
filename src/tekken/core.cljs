@@ -143,8 +143,8 @@
       (when (pos? (count (:variants app)))
         (let [ch (util/build)]
           (go
-           (js/alert (<! ch))
-           (om/update! app :variants [])))))
+            (<! ch)
+            (om/update! app :variants [])))))
 
     om/IRenderState
     (render-state
