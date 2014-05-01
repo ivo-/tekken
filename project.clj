@@ -11,7 +11,14 @@
                  [org.clojure/clojurescript "0.0-2173"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [secretary "1.0.3"]
-                 [om "0.5.3"]]
+                 [om "0.5.3"]
+                 [com.cemerick/piggieback "0.1.3"]]
+
+  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+  :injections [(require '[cljs.repl.browser :refer (repl-env)]
+                        '[cemerick.piggieback :refer (cljs-repl)])
+               (defn brepl []
+                 (cljs-repl :repl-env (repl-env :port 9000)))]
 
   :plugins [[lein-cljsbuild "1.0.2"]]
 
@@ -22,7 +29,7 @@
                                    :optimizations :none
                                    :source-map true}}
                        {:id "prod"
-                        :source-paths ["src"]
+                        :source-paths ["src/tekken"]
                         :compiler {
                                    :output-to "app.js"
                                    :optimizations :advanced
