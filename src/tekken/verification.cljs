@@ -1,3 +1,7 @@
+;; ==================================================================
+;;; TODO:
+;; ==================================================================
+
 (ns tekken.verification
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [tekken.statistics :as stats]
@@ -216,8 +220,3 @@
               :onClick #(do (om/set-state! owner :show true)
                           (om/update! solutions [(new-solution @app)]))}
          "Започни въвеждане на решения"))))))
-
-
-
-
-

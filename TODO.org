@@ -3,12 +3,17 @@
 - [ ] Add demo URL
 - [ ] Separate components and cleanup code base
 
+- [ ] Work on verification intreface
 - [ ] Generate better statistics and diagrams
 - [ ] Add data persistence
-- [ ] Make JavaScript port of the recognizer
 - [ ] Add Recognizer tests images in /test
+
+- [ ] Add README for recognizer.
+- [ ] Make JavaScript port of the recognizer
 
 - [ ] Separate answers and tests PDFs
 - [ ] Multiple variants of answer sheets
 - [ ] Options for what to generate
 - [ ] Try PDF generator's html functionality
+
+- [ ] Translationsg
