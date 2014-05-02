@@ -41,12 +41,7 @@
         parse-question
         (fn [i data]
           {:text
-           [(apply
-              vector
-              "header"
-              (let [[tag & more] (first data)]
-                (apply vector tag ["b" ["u" (str " " (inc i) ".")] " "] more))
-              (mapv pre-process-data (rest data)))]
+           (mapv pre-process-data data)
 
            :answers
            (->> data
@@ -65,9 +60,18 @@
       (map-indexed parse-question)
       (vec))))
 
+(defn prettify-question [i data]
+  [(apply
+     vector
+     "header"
+     (let [[tag & more] (first data)]
+       (apply vector tag ["b" ["u" (str " " (inc i) ".")] " "] more))
+     (vec (rest data)))])
+
 (defn edn->html
   [{:keys [questions title variant]}]
   (->> (map :text questions)
+    (map-indexed prettify-question)
     (reduce concat)
     (cons ["i" (str "Вариант: " variant)])
     (cons (apply vector "i" "Група:" (repeat 7 ".")))
@@ -77,19 +81,3 @@
     (cons "html")
     (clj->js)
     (.renderJsonML js/Markdown)))
-
-;; =============================================================================
-;; Playground
-
-;; (defn add-number
-;;   [[[tag & children] & rest :as data]]
-;;   (apply vector tag ["b" ["u" (str " " (inc 1) ".")] " "] more)
-;;   data)
-
-;; (md->edn
-;; "Температура на кипене на водата?
-
-;; + 100 градуса по целзий
-;; - 0 градуса по целзий
-;; - 100 градуса по фаренхайт
-;; - 43 градуса по фаренхайт")
