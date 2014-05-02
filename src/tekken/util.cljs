@@ -80,7 +80,7 @@
     (cons ["i" (str "Вариант: " variant)])
     (cons (apply vector "i" "Група:" (repeat 7 ".")))
     (cons (apply vector "i" "ФН:" (repeat 7 ".")))
-    (cons (apply vector "i" "Име:" (repeat 100 ".")))
+    (cons (apply vector "i" "Име:" (repeat 85 ".")))
     (cons ["h1" title])
     (cons "html")
     (clj->js)

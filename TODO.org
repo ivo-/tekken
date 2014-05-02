@@ -1,7 +1,5 @@
 * TODO:
 
-- [ ] Add demo URL
-
 - [ ] Work on verification intreface
 - [ ] Generate statistics and diagrams
 - [ ] Add data persistence
