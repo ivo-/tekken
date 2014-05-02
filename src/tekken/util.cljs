@@ -67,6 +67,16 @@
        (apply vector tag ["b" ["u" (str " " (inc i) ".")] " "] more))
      (vec (rest data)))])
 
+(defn today
+  []
+  (let [moment (js/Date.)
+        dd (-> (.getDate moment))
+        dd (if (< dd 10) (str "0" dd) dd)
+        mm (inc (.getMonth moment))
+        mm (if (< mm 10) (str "0" mm) mm)
+        yy (.getFullYear moment)]
+    (str dd "." mm "." yy "г.")))
+
 (defn ->html
   "Generates HTML. Expects following options:
 
@@ -77,11 +87,6 @@
   (->> (map :text questions)
     (map-indexed add-question-number)
     (reduce concat)
-    (cons ["i" (str "Вариант: " variant)])
-    (cons (apply vector "i" "Група:" (repeat 7 ".")))
-    (cons (apply vector "i" "ФН:" (repeat 7 ".")))
-    (cons (apply vector "i" "Име:" (repeat 85 ".")))
-    (cons ["h1" title])
     (cons "html")
     (clj->js)
     (.renderJsonML js/Markdown)))

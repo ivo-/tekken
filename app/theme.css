@@ -1,3 +1,6 @@
+/******************************************************************************/
+/* Layout */
+
 html, body {
     background: white;
     padding: 0px;
@@ -43,6 +46,17 @@ html, body {
     padding-top: 55px;
 }
 
+code {
+    white-space: pre;
+}
+
+ul {
+    list-style: none;
+}
+
+/******************************************************************************/
+/* Editor */
+
 #editor textarea {
     margin: 0 auto;
     padding: 0px;
@@ -51,19 +65,34 @@ html, body {
     width: 100%;
 }
 
-#main a {
-    background-color: #FFFFFF;
-}
+/******************************************************************************/
+/* Options */
 
-.field-group {
+#options .field-group {
     display: inline-block;
     margin-left: 5px;
 }
 
-.field-group label {
+#options .field-group label {
     display: block;
     font-weight: bold;
 }
+
+/******************************************************************************/
+/* Answers table */
+
+table.answers {
+    border-collapse: collapse;
+}
+
+table.answers td {
+    border: solid 1px;
+    width: 20px;
+    text-align: center;
+}
+
+/******************************************************************************/
+/* Viewer */
 
 #viewer {
     width: 58%;
@@ -72,15 +101,26 @@ html, body {
 }
 
 #variants {
-    margin-top: 500px;
+    /* I know you will hate me for this, but the thing
+       should be visible so that we can get proper
+       client/scroll width/height. */
+    margin-top: 5000px;
 }
 
-#page,
-#viewer section.answers,
-#variants section.page,
-#variants section.answers {
+#viewer div.test-header,
+#variants div.test-header {
+    margin-bottom: 20px;
+}
+
+#viewer div.test-header .fn,
+#variants div.test-header .fn {
+    display: inline-block;
+    margin-right: 40mm;
+}
+
+#viewer section,
+#variants section {
     width: 210mm;
-    height: 297mm;
     overflow: hidden;
     background: white;
     position: relative;
@@ -91,9 +131,35 @@ html, body {
     box-sizing: border-box;
 }
 
-#page {
-    height: auto;
+#variants section {
+    height: 297mm;
 }
+
+#viewer .page h1, #viewer .page h2, #viewer .page h3,
+#variants .page h1, #variants .page h2, #variants .page h3 {
+    text-align: center;
+    margin: 0px 0px;
+    padding: 0px 0px;
+    font-weight: normal;
+}
+
+#viewer h1,
+#variants h1 {
+    font-size: 2em;
+}
+
+#viewer h2,
+#variants h2 {
+    font-size: 1.6em;
+}
+#viewer h3,
+#variants h3 {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+}
+
+/******************************************************************************/
+/* Answers key/sheet */
 
 .answers-key h1, .answers-sheet h1 {
     font-size: 2em;
@@ -103,15 +169,6 @@ html, body {
 #options input {
     display: block;
 }
-
-code {
-    white-space: pre;
-}
-
-ul {
-    list-style: none;
-}
-
 
 .row .column {
     display: inline-block;

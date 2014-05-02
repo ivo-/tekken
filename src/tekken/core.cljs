@@ -9,7 +9,7 @@
 ;; Data
 
 (def data
-  (atom {:test-data {:title "UI тест"
+  (atom {:test-data {:title "Програмиране с Clojure, Тест № 1"
                      :questions {}
                      :num-variants 5
                      :per-variant 15}
@@ -186,6 +186,38 @@
                 (map #(dom/div #js {:className (when % "filled")}) answers)))
             questions))))))
 
+(defn test-header
+  [{:keys [title variant]}]
+  (dom/div
+    #js {:className "test-header"}
+    (dom/h1 nil title)
+    (dom/h2 nil (str "Вариант: " variant))
+    (dom/h3 nil (util/today))
+    (dom/i #js {:className "fn"} "Факултетен номер:")
+    (dom/i nil "Име:")))
+
+(defn answers-table
+  []
+  (dom/table #js {:className "answers"}
+    (apply
+      dom/tr nil
+      (for [i (range 1 16)] (dom/td nil i)))
+    (apply
+      dom/tr nil
+      (for [i (range 1 16)]
+        (dom/td (clj->js {:dangerouslySetInnerHTML
+                          {:__html "&nbsp;"}}))))
+
+    (apply
+      dom/tr nil
+      (for [i (range 16 31)] (dom/td nil i)))
+
+    (apply
+      dom/tr nil
+      (for [i (range 1 16)]
+        (dom/td (clj->js {:dangerouslySetInnerHTML
+                          {:__html "&nbsp;"}}))))))
+
 (defn viewer
   "Test viewer component for imediate preview of document state."
   [{:keys [test-data]} owner]
@@ -197,10 +229,11 @@
         (dom/div
           #js {:id "viewer"}
           (dom/section
-            (clj->js
-              {:id "page"
-               :dangerouslySetInnerHTML
-               {:__html (util/->html data)}}))
+            #js {:className "page"}
+            (test-header test-data)
+            (answers-table)
+            (dom/div (clj->js {:dangerouslySetInnerHTML
+                               {:__html (util/->html data)}})))
           ;; Don't forget to pass some app state to each component. Otherwise
           ;; Om cannot know when to update it.
           (om/build answers-key test-data {:opts data})
