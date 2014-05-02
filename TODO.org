@@ -1,14 +1,13 @@
 * TODO:
 
 - [ ] Add demo URL
-- [ ] Separate components and cleanup code base
 
 - [ ] Work on verification intreface
-- [ ] Generate better statistics and diagrams
+- [ ] Generate statistics and diagrams
 - [ ] Add data persistence
-- [ ] Add Recognizer tests images in /test
 
 - [ ] Add README for recognizer.
+- [ ] Add Recognizer tests images in /test
 - [ ] Make JavaScript port of the recognizer
 
 - [ ] Separate answers and tests PDFs
@@ -16,4 +15,4 @@
 - [ ] Options for what to generate
 - [ ] Try PDF generator's html functionality
 
-- [ ] Translationsg
+- [ ] Translations
