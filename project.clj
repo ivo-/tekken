@@ -31,8 +31,8 @@
                        {:id "prod"
                         :source-paths ["src/tekken"]
                         :compiler {
-                                   :output-to "app.js"
-                                   :optimizations :advanced
+                                   :output-to "app/app.js"
+                                   :optimizations :simple
                                    :elide-asserts true
                                    :pretty-print false
                                    :output-wrapper false
