@@ -104,7 +104,7 @@
        (fn [_]
          (let [value (->> (om/get-node owner "text")
                        (.-value))
-               edn (util/md->edn value)]
+               edn (util/parse-md value)]
            (om/set-state! owner :text value)
            (om/update! test-data :questions edn)))})
 
@@ -200,7 +200,7 @@
             (clj->js
               {:id "page"
                :dangerouslySetInnerHTML
-               {:__html (util/edn->html data)}}))
+               {:__html (util/->html data)}}))
           ;; Don't forget to pass some app state to each component. Otherwise
           ;; Om cannot know when to update it.
           (om/build answers-key test-data {:opts data})
@@ -232,7 +232,7 @@
               (dom/section
                 (clj->js {:className "page"
                           :dangerouslySetInnerHTML
-                          {:__html (util/edn->html data)}}))
+                          {:__html (util/->html data)}}))
               (om/build answers-sheet nil {:opts data})
               (om/build answers-key nil {:opts data}))))))))
 

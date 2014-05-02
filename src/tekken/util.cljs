@@ -3,22 +3,20 @@
             [cljs.reader :as reader]))
 
 (defn build
+  "Builds the zip and sends it for download."
   []
   (let [ch (chan)]
     (js/tekken_build #(put! ch %))
     ch))
 
-(defn md->html
-  [s]
-  (. js/Markdown toHTML s))
-
-(defn md->edn
-  "...where all the magic happens."
+(defn parse-md
+  "Parses questions markdown and generates vector of
+   questions."
   [s]
   (let [prefixes ["a)" "b)" "c)" "d)" "e)" "f)" "g)"]
 
-        hack-rx (js/RegExp. "\\[!]")
-        correct-rx (js/RegExp. "^\\+\\s" "gm")
+        rhack    (js/RegExp. "\\[!]")
+        rcorrect (js/RegExp. "^\\+\\s" "gm")
 
         pre-process-option
         (fn [i [li text & more]]
@@ -26,7 +24,7 @@
             (str (prefixes i)
               " "
               (if (string? text)
-                (.replace text hack-rx "")
+                (.replace text rhack "")
                 text))
             more))
 
@@ -49,18 +47,19 @@
              (first)
              (rest)
              (map second)
-             (map #(.test hack-rx %)))})]
-    (->> (.replace s correct-rx "- [!]")
+             (map #(.test rhack %)))})]
+    (->> (.replace s rcorrect "- [!]")
       (. js/Markdown toHTMLTree)
       (js->clj)
-      (rest)
+      (rest) ; remove "html"
       (partition-by #(= "ul" (first %)))
       (partition-all 2)
       (map (partial reduce concat))
       (map-indexed parse-question)
       (vec))))
 
-(defn prettify-question [i data]
+(defn- add-question-number
+  [i data]
   [(apply
      vector
      "header"
@@ -68,10 +67,15 @@
        (apply vector tag ["b" ["u" (str " " (inc i) ".")] " "] more))
      (vec (rest data)))])
 
-(defn edn->html
+(defn ->html
+  "Generates HTML. Expects following options:
+
+    :title     - text title
+    :variant   - variant name
+    :questions - result from parse-md"
   [{:keys [questions title variant]}]
   (->> (map :text questions)
-    (map-indexed prettify-question)
+    (map-indexed add-question-number)
     (reduce concat)
     (cons ["i" (str "Вариант: " variant)])
     (cons (apply vector "i" "Група:" (repeat 7 ".")))
