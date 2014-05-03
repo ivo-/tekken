@@ -1,18 +1,14 @@
 * TODO:
 
-- [ ] Fork me on github
-
-- [ ] Work on verification intreface
+- [ ] Work on verification interface
 - [ ] Generate statistics and diagrams
 - [ ] Add data persistence
 
-- [ ] Add README for recognizer.
+- [ ] Add README for recognizer
 - [ ] Add Recognizer tests images in /test
 - [ ] Make JavaScript port of the recognizer
 
 - [ ] Separate answers and tests PDFs
-- [ ] Multiple variants of answer sheets
-- [ ] Options for what to generate
 - [ ] Try PDF generator's html functionality
 
 - [ ] Translations
