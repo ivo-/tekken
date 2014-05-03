@@ -1,4 +1,15 @@
 /******************************************************************************/
+/* Basic */
+
+code {
+    white-space: pre;
+}
+
+ul {
+    list-style: none;
+}
+
+/******************************************************************************/
 /* Layout */
 
 html, body {
@@ -11,6 +22,17 @@ html, body {
     overflow: hidden;
     position: relative;
 }
+
+#left {
+    width: 40%;
+    overflow: hidden;
+    display: inline-block;
+    float: left;
+    padding-top: 55px;
+}
+
+/******************************************************************************/
+/* Overlay */
 
 #overlay {
     top: 0px;
@@ -38,22 +60,6 @@ html, body {
     background-color: white;
 }
 
-#left {
-    width: 40%;
-    overflow: hidden;
-    display: inline-block;
-    float: left;
-    padding-top: 55px;
-}
-
-code {
-    white-space: pre;
-}
-
-ul {
-    list-style: none;
-}
-
 /******************************************************************************/
 /* Editor */
 
@@ -68,6 +74,10 @@ ul {
 /******************************************************************************/
 /* Options */
 
+#options input {
+    display: block;
+}
+
 #options .field-group {
     display: inline-block;
     margin-left: 5px;
@@ -81,18 +91,45 @@ ul {
 /******************************************************************************/
 /* Answers table */
 
-table.answers {
+table.answers-table {
     border-collapse: collapse;
+    margin: 20px auto;
 }
 
-table.answers td {
+table.answers-table td {
     border: solid 1px;
     width: 20px;
     text-align: center;
 }
 
 /******************************************************************************/
-/* Viewer */
+/* Test header */
+
+div.test-header {
+    margin-bottom: 20px;
+}
+
+div.test-header h1, div.test-header h2, div.test-header h3 {
+    text-align: center;
+    margin: 0px 0px;
+    padding: 0px 0px;
+    font-weight: normal;
+}
+
+div.test-header h1 {
+    font-size: 2em;
+}
+
+div.test-header h2 {
+    font-size: 1.6em;
+}
+div.test-header h3 {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+}
+
+/******************************************************************************/
+/* Viewer and variants */
 
 #viewer {
     width: 58%;
@@ -107,19 +144,14 @@ table.answers td {
     margin-top: 5000px;
 }
 
-#viewer div.test-header,
-#variants div.test-header {
-    margin-bottom: 20px;
-}
-
-#viewer div.test-header .fn,
-#variants div.test-header .fn {
+#viewer .fn,
+#variants .fn {
     display: inline-block;
     margin-right: 40mm;
 }
 
-#viewer section,
-#variants section {
+section.page,
+section.answers-page {
     width: 210mm;
     overflow: hidden;
     background: white;
@@ -131,43 +163,25 @@ table.answers td {
     box-sizing: border-box;
 }
 
-#variants section {
+#variants section.page,
+#variants section.answers-page {
     height: 297mm;
-}
-
-#viewer .page h1, #viewer .page h2, #viewer .page h3,
-#variants .page h1, #variants .page h2, #variants .page h3 {
-    text-align: center;
-    margin: 0px 0px;
-    padding: 0px 0px;
-    font-weight: normal;
-}
-
-#viewer h1,
-#variants h1 {
-    font-size: 2em;
-}
-
-#viewer h2,
-#variants h2 {
-    font-size: 1.6em;
-}
-#viewer h3,
-#variants h3 {
-    font-size: 1.3em;
-    margin-bottom: 30px;
 }
 
 /******************************************************************************/
 /* Answers key/sheet */
 
+/* REVIEW: Optimize selectors and stuff. */
 .answers-key h1, .answers-sheet h1 {
     font-size: 2em;
     text-align: center;
+    margin: 10px 0 0 0;
 }
 
-#options input {
-    display: block;
+.answers-key h2, .answers-sheet h2 {
+    font-size: 1.6em;
+    text-align: center;
+    margin: 0 0 10px 0;
 }
 
 .row .column {
@@ -181,7 +195,6 @@ table.answers td {
     height: 4mm;
     border: 1mm solid black;
     text-align: center;
-    /* margin: 10px; */
     margin-top: 6mm;
     font-size: 13px;
 }
@@ -205,7 +218,7 @@ div.marker {
     width: 10mm;
     height: 10mm;
     background: black;
-    /* Good enough for the demo */
+    /* TODO: Good enough for the demo. */
     /*     background-image: url('patternRecognition/marker.png'); */
     display: inline-block;
 }

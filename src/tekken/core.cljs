@@ -9,10 +9,11 @@
 ;; Data
 
 (def data
-  (atom {:test-data {:title "Програмиране с Clojure, Тест № 1"
+  (atom {:test-data {:type :simple
+                     :title "Clojure Programming, Quiz № 01"
                      :questions {}
-                     :num-variants 5
-                     :per-variant 15}
+                     :per-variant 15
+                     :num-variants 5}
          :variants []
          :solutions []}))
 
@@ -62,12 +63,22 @@
                (om/update! test-data k value)))))
        :onBlur
        (fn [k e]
-         (om/set-state! owner k (k @test-data)))})
+         (om/set-state! owner k (k @test-data)))
+
+       :onTypeChange
+       (fn [e]
+         (let [v (.val (js/$ (.. e -target)))]
+           (case v
+             "simple"
+             (om/update! test-data :type :simple)
+
+             "auto"
+             (om/update! test-data :type :auto))))})
 
     om/IRenderState
     (render-state
       [_ {:keys [per-variant num-variants
-                 onChange onBlur onTitleChange]}]
+                 onChange onBlur onTitleChange onTypeChange]}]
       (dom/form #js {:id "options"
                      :action "javascript: void(0);"}
         (dom/div #js {:className "field-group"}
@@ -91,7 +102,15 @@
             #js {:type "text"
                  :value per-variant
                  :onBlur (partial onBlur :per-variant)
-                 :onChange (partial onChange :per-variant)}))))))
+                 :onChange (partial onChange :per-variant)}))
+
+        (dom/div #js {:className "field-group"}
+          (dom/label nil "Test type: ")
+          (dom/select #js {:onChange onTypeChange
+                           :value (name (:type test-data))}
+            (dom/option #js {:value "simple"} "simple")
+            (dom/option #js {:value "auto"} "auto")))))))
+
 (defn editor
   "Component responsible for editing markdown for questions."
   [{:keys [test-data] :as app} owner]
@@ -126,7 +145,7 @@
         (dom/hr nil)))))
 
 ;; ----------------------------------------------------------------------------
-;; Viewer
+;; Answers sheet/key
 
 (defn draw-squares
   [columns rows add-number? add-label?]
@@ -140,20 +159,20 @@
     (apply dom/div #js {:className "row"})))
 
 (defn answers-sheet
-  [_ owner {:keys [questions variant per-variant] :as data}]
+  [{:keys [questions variant per-variant] :as data} owner]
   (reify
     om/IRender
     (render
      [_]
      (dom/section
-       #js {:className "answers-sheet answers"}
+       #js {:className "answers-page answers-sheet"}
        (dom/div
          #js {:className "mark"}
          (dom/div #js {:className "marker top-left"})
          (dom/div #js {:className "marker top-center"})
          (dom/div #js {:className "marker top-right"}))
 
-       (dom/h1 nil "ANSWER SHEET")
+       (dom/h1 nil "Answers Sheet")
        (dom/h4 #js {:className "boxname"} "Name:")
 
        (dom/h3 nil "Faculty number:" )
@@ -168,16 +187,17 @@
          (dom/div #js {:className "marker bottom-right"}))))))
 
 (defn answers-key
-  [_ owner {:keys [questions variant] :as data}]
+  [{:keys [questions variant] :as data} owner]
   (reify
     om/IRender
     (render
       [_]
       (dom/section
-        #js {:className "answers-key answers"}
+        #js {:className "answers-page answers-key"}
         (apply
           dom/div #js {:className "row"}
-          (dom/h1 nil "ANSWERS KEY" (dom/br nil) variant)
+          (dom/h1 nil "Answers Key")
+          (dom/h2 nil variant)
           (map-indexed
             (fn [index {:keys [answers]}]
               (apply
@@ -186,66 +206,119 @@
                 (map #(dom/div #js {:className (when % "filled")}) answers)))
             questions))))))
 
+;; ----------------------------------------------------------------------------
+;; Answers table
+
+(defn answers->letter
+  "Returns letter for the correct answer. `coll` is a vector of
+   boolean values, one of which is true."
+  [coll]
+  (cond
+    (nth coll 0) "a"
+    (nth coll 1) "b"
+    (nth coll 2) "c"
+    (nth coll 3) "d"
+    (nth coll 4) "e"))
+
+(defn answers-table
+  "Generates answers table from provide test data and optionally
+   includes the correct answers."
+  [{:keys [questions per-variant]} include-answers?]
+  (let [on-row 15
+
+        rows
+        (->> (map :answers questions)
+          (map answers->letter)
+          (partition-all on-row))
+
+        build-row
+        (fn [i row]
+          (vector
+            ;; Add questions numbers.
+            (apply dom/tr nil
+              (for [n (range 1 (inc (count row)))]
+                (dom/td nil  (+ (* on-row i) n))))
+
+            ;; Add answers or blank cells.
+            (if include-answers?
+              (apply dom/tr nil
+                (for [letter row] (dom/td nil letter)))
+              (apply dom/tr nil
+                (for [_ row]
+                  (dom/td (clj->js {:dangerouslySetInnerHTML
+                                    {:__html "&nbsp;"}})))))))]
+    (apply dom/table #js {:className "answers-table"}
+      (apply concat (map-indexed build-row rows)))))
+
+;; ----------------------------------------------------------------------------
+;; Viewer
+
 (defn test-header
+  "Generates test header from provided test data."
   [{:keys [title variant]}]
   (dom/div
     #js {:className "test-header"}
     (dom/h1 nil title)
-    (dom/h2 nil (str "Вариант: " variant))
-    (dom/h3 nil (util/today))
-    (dom/i #js {:className "fn"} "Факултетен номер:")
-    (dom/i nil "Име:")))
+    (dom/h2 nil (str "Variant " variant))
+    (dom/h3 nil (util/today))))
 
-(defn answers-table
-  []
-  (dom/table #js {:className "answers"}
-    (apply
-      dom/tr nil
-      (for [i (range 1 16)] (dom/td nil i)))
-    (apply
-      dom/tr nil
-      (for [i (range 1 16)]
-        (dom/td (clj->js {:dangerouslySetInnerHTML
-                          {:__html "&nbsp;"}}))))
+(defn test-view
+  "Generates test view from provided test data. Here is where we
+   decide what to for different test types."
+  [data]
+  (dom/div nil
+    ;; Make sure seaction with class `page` wraps test header and
+    ;; contents. On build each section with class page will be split
+    ;; into multiple A4 pages if necessary.
+    ;;
+    ;; Answers shouldn't be in `page` sections.
+    (dom/section #js {:className "page"}
+      (test-header data)
 
-    (apply
-      dom/tr nil
-      (for [i (range 16 31)] (dom/td nil i)))
+      (case (:type data)
+        :simple
+        (dom/div nil
+          (dom/i #js {:className "fn"} "FN:")
+          (dom/i nil "Name:")
+          (answers-table data false))
 
-    (apply
-      dom/tr nil
-      (for [i (range 1 16)]
-        (dom/td (clj->js {:dangerouslySetInnerHTML
-                          {:__html "&nbsp;"}}))))))
+        :auto
+        nil) ;; Om just skips nil values.
+
+      (dom/div (clj->js {:dangerouslySetInnerHTML
+                         {:__html (util/->html data)}})))
+
+    ;; Make sure all answers documents are wrapped into
+    ;; `section.answers-page`. The builder will include all of them
+    ;; into the generated pdf.
+    (case (:type data)
+      :simple
+      (dom/section #js {:className "answers-page"}
+        (test-header data)
+        (answers-table data true))
+
+      :auto
+      (dom/div nil
+        ;; Both things are wrapped with `seciton.answers-page`.
+        (om/build answers-key data)
+        (om/build answers-sheet data)))))
 
 (defn viewer
-  "Test viewer component for imediate preview of document state."
+  "Test viewer component for immediate preview of the document state."
   [{:keys [test-data]} owner]
   (reify
     om/IRender
     (render
       [_]
-      (let [data (assoc test-data :variant "[example]")]
+      (let [data (assoc test-data :variant "_")]
         (dom/div
           #js {:id "viewer"}
-          (dom/section
-            #js {:className "page"}
-            (test-header test-data)
-            (answers-table)
-            (dom/div (clj->js {:dangerouslySetInnerHTML
-                               {:__html (util/->html data)}})))
-          ;; Don't forget to pass some app state to each component. Otherwise
-          ;; Om cannot know when to update it.
-          (om/build answers-key test-data {:opts data})
-          (om/build answers-sheet test-data {:opts data}))))))
-
-;; ----------------------------------------------------------------------------
-;; Download
+          (test-view data))))))
 
 (defn variants
   "Component that renders all the variants with their corresponding
-   answers-keys and answers-sheets. This will generate DOM that will
-   be used for generating PDFs."
+   answers parts. This will render the DOM that will be used for
+   generating PDFs."
   [{:keys [variants test-data] :as app} owner]
   (reify
     om/IRender
@@ -262,12 +335,10 @@
                        (assoc :variant n))]
             (dom/div
               #js {:className "variant"}
-              (dom/section
-                (clj->js {:className "page"
-                          :dangerouslySetInnerHTML
-                          {:__html (util/->html data)}}))
-              (om/build answers-sheet nil {:opts data})
-              (om/build answers-key nil {:opts data}))))))))
+              (test-view data))))))))
+
+;; ----------------------------------------------------------------------------
+;; Download
 
 (defn download-button
   "Button for generating and downloading of all pdf files."

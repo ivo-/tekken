@@ -1,48 +1,67 @@
-var pagify = function(ctx) {
-    var page = $("section.page:last", ctx);
-    var extra = $("<section class='page'></section>");
+(function () {
+    // Separate initial variant page into multiple A4 pages.
+    var pagify = function(ctx) {
+        var $page = $("section.page:last", ctx);
+        var $extra = $("<section class='page'></section>");
 
-    while (page[0].clientHeight < page[0].scrollHeight) {
-        extra.prepend(page.find("header:last").remove());
-    }
+        while ($page[0].clientHeight < $page[0].scrollHeight) {
+            $extra.prepend($page.find("header:last").remove());
+        }
 
-    if (extra.children().length) {
-        extra.insertAfter(page);
-        pagify(ctx);
-    }
-};
+        if ($extra.children().length) {
+            $extra.insertAfter($page);
+            pagify(ctx);
+        }
+    };
 
-var tekken_build = function(callback) {
-    $("#overlay").show();
-    var vcount = 0;
-    var zip = new JSZip();
-    var variants = $("#variants div.variant");
+    // TODO: Rename to build.
+    window.tekken_build = function(callback) {
+        $("#overlay").show();
 
-    variants.each(function(){
-        pagify(this);
-    });
+        var $variants = $("#variants div.variant");
 
-    $.map(variants, function(variant, i) {
-        var doc = new jsPDF("p", "mm", "a4");
-        var pages = $("section.page, section.answers", variant);
-        var pcount = 0;
-
-        return $.map(pages, function(page){
-            return html2canvas(page, {onrendered: function(canvas) {
-                doc.addImage(canvas.toDataURL("image/jpeg"), 0, 0, 210, 297);
-                doc.addPage();
-
-                if (++pcount == pages.length) {
-                    ++vcount;
-                    zip.file(vcount + ".pdf", doc.output(), {binary: true});
-
-                    if (vcount == variants.length) {
-                        saveAs(zip.generate({type:"blob"}), "test.zip");
-                        $("#overlay").hide();
-                        callback(true);
-                    }
-                }
-            }});
+        $variants.each(function(){
+            pagify(this);
         });
-    });
-};
+
+        var zip = new JSZip();
+        var vcount = 0;
+
+        $.map($variants, function(variant, i) {
+            // Both test and answers pages should be included into the PDF.
+            var $pages = $("section.page, section.answers-page", variant);
+
+            var doc = new jsPDF("p", "mm", "a4");
+            var pcount = 0;
+
+            return $.map($pages, function(page){
+                return html2canvas(page, {onrendered: function(canvas) {
+                    // One page ready.
+                    ++pcount;
+
+                    doc.addImage(canvas.toDataURL("image/jpeg"), 0, 0, 210, 297);
+
+                    if (pcount == $pages.length) {
+
+                        // One variant ready.
+                        ++vcount;
+
+                        // DEBUG:
+                        if (vcount == 1) {  doc.output('dataurlnewwindow'); return; }
+
+                        zip.file(vcount + ".pdf", doc.output(), {binary: true});
+
+                        if (vcount == $variants.length) {
+                            saveAs(zip.generate({type:"blob"}), "test.zip");
+                            $("#overlay").hide();
+                            callback(true);
+                        }
+                    } else {
+                        doc.addPage();
+                    }
+                }});
+            });
+        });
+    };
+
+})();
