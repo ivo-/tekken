@@ -1,5 +1,6 @@
 (function () {
-    // Separate initial variant page into multiple A4 pages.
+    // Separate initial variant page into multiple A4 pages. `ctx`
+    // should be some of the `.variant` nodes.
     var pagify = function(ctx) {
         var $page = $("section.page:last", ctx);
         var $extra = $("<section class='page'></section>");
@@ -14,8 +15,7 @@
         }
     };
 
-    // TODO: Rename to build.
-    window.tekken_build = function(callback) {
+    window.start_build = function(callback) {
         $("#overlay").show();
 
         var $variants = $("#variants div.variant");
@@ -47,7 +47,7 @@
                         ++vcount;
 
                         // DEBUG:
-                        if (vcount == 1) {  doc.output('dataurlnewwindow'); return; }
+                        // if (vcount == 1) doc.output('dataurlnewwindow');
 
                         zip.file(vcount + ".pdf", doc.output(), {binary: true});
 

@@ -6,7 +6,7 @@
   "Builds the zip and sends it for download."
   []
   (let [ch (chan)]
-    (js/tekken_build #(put! ch %))
+    (js/start_build #(put! ch %))
     ch))
 
 (defn parse-md
