@@ -169,6 +169,17 @@ section.answers-page {
 }
 
 /******************************************************************************/
+/* Download button */
+
+#download {
+    font: normal 30px 'Verdana';
+    border: #ddd solid 1px;
+    padding: 3px 10px;
+
+    display: inline-block;
+}
+
+/******************************************************************************/
 /* Answers key/sheet */
 
 /* REVIEW: Optimize selectors and stuff. */

@@ -367,7 +367,8 @@
     (render-state
       [_ {:keys [onClick]}]
       (dom/div nil
-        (dom/a #js {:href "javascript:void(0);"
+        (dom/a #js {:id "download"
+                    :href "javascript:void(0);"
                     :onClick onClick} "Download")
         (om/build variants app)))))
 
