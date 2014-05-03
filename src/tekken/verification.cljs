@@ -1,6 +1,6 @@
-;; ==================================================================
-;;; TODO:
-;; ==================================================================
+;; TODO: Verification interface. It should be an alternative to image
+;;       recognition variant, giving the same benefits from automatic
+;;       verification.
 
 (ns tekken.verification
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])

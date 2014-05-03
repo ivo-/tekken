@@ -1,3 +1,5 @@
+;;; TODO: Optional persistence for all user generated tests.
+
 (ns tekken.store
   (:require [cljs.core.async :refer [chan put!]]
             [cljs.reader :as reader]))
