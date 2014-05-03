@@ -47,7 +47,7 @@
                         ++vcount;
 
                         // DEBUG:
-                        // if (vcount == 1) doc.output('dataurlnewwindow');
+                        if (vcount == 1) doc.output('dataurlnewwindow');
 
                         zip.file(vcount + ".pdf", doc.output(), {binary: true});
 
