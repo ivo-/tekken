@@ -24,7 +24,7 @@ and others.
 - Start the project
 
     * Build the code
-    * `open resources/index.html`
+    * `open app/index.html`
 
 ## License
 

@@ -1,5 +1,9 @@
-* TODO:
+* TODO
 
+- [ ] Progress bar
+- [ ] Move to weasel
+- [ ] Upgrade Om and React
+- [ ] Upgrade jsPDF
 - [ ] Work on verification interface
 - [ ] Generate statistics and diagrams
 - [ ] Add data persistence
@@ -12,3 +16,8 @@
 - [ ] Try PDF generator's html functionality
 
 - [ ] Translations
+
+* Bugs
+
+- [ ] Fix parser issues
+- [ ] Fix creating of 5+ variants
